@@ -58,7 +58,7 @@ const  TeacherNavigation = () => {
           component={LearningScreen}
           options={{
             headerTitle: () => (
-              <Text style={styles.headerTitle}>Lectures</Text>
+              <Text style={styles.headerTitle}>Лекции</Text>
             ),
           }}
         />
@@ -67,7 +67,7 @@ const  TeacherNavigation = () => {
           component={StaticticsScreen} 
           options={{
             headerTitle: () => (
-              <Text style={styles.headerTitle}>Statistics</Text>
+              <Text style={styles.headerTitle}>Статистика</Text>
             ),
           }}
         />
@@ -76,7 +76,7 @@ const  TeacherNavigation = () => {
           component={CreatingTestsScreen}
           options={{
             headerTitle: () => (
-              <Text style={styles.headerTitle}>Tests</Text>
+              <Text style={styles.headerTitle}>Тесты</Text>
             ),
           }}
         />

@@ -30,6 +30,7 @@ import SignupScreen from './screens/SignupScreen';
 import TestScreen from './screens/TestScreen';
 import StudentsMarksListScreen from './screens/StudentsMarksListScreen';
 import LectureListScreen from './screens/LectureListScreen';
+import GroupStudentsListScreen from './screens/GroupStudentsListScreen';
 import LoadingScreen from './screens/LoadingScreen';
 
 //Navigation
@@ -150,6 +151,7 @@ const App = (): React.JSX.Element => {
                 {userPermission === 'teacher' ? (
                   <>
                     <Stack.Screen name="Home" component={TeacherNavigation} options={{ headerShown: false }} />
+                    <Stack.Screen name="Студенты" component={GroupStudentsListScreen} />
                     <Stack.Screen name="Список оценок" component={StudentsMarksListScreen} />
                     <Stack.Screen name="Лекция" component={LectureListScreen} />
                   </>

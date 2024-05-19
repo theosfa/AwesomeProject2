@@ -1,8 +1,8 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import HomeScreen from '../screens/HomeScreen';
-import LearningScreen from '../screens/LearningScreen.js';
+import TeachersListScreen from '../screens/TeachersListScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import CreateTeacherScreen from '../screens/CreateTeacherScreen';
 
 import {StyleSheet, Image, Text} from 'react-native';
 
@@ -24,18 +24,12 @@ const  MainAppTabs = () => {
             <Image source={require('../assets/images/home-outline.png')} style={styles.iconFocused} /> 
             : 
             <Image source={require('../assets/images/home.png')} style={styles.iconNotFocused}/>;
-          } else if (route.name === 'Профиль') {
+          } else if (route.name === 'Создание') {
             return !focused 
             ? 
             <Image source={require('../assets/images/person-outline.png')} style={styles.iconFocused}/> 
             : 
             <Image source={require('../assets/images/person.png')} style={styles.iconNotFocused}/>;
-          } else if (route.name === 'Обучение') {
-            return !focused 
-            ? 
-            <Image source={require('../assets/images/learning-outline.png')} style={styles.iconFocused}/> 
-            : 
-            <Image source={require('../assets/images/learning.png')} style={styles.iconNotFocused}/>;
           }
 
           return <Image source={require('../assets/images/home.png')} style={styles.iconFocused} />;
@@ -54,29 +48,20 @@ const  MainAppTabs = () => {
       })}
     >
       <Tab.Screen 
-          name="Обучение" 
-          component={LearningScreen}
+          name="Главная" 
+          component={ProfileScreen}
           options={{
             headerTitle: () => (
-              <Text style={styles.headerTitle}>Learning</Text>
+              <Text style={styles.headerTitle}>Главная</Text>
             ),
           }}
         />
       <Tab.Screen 
-          name="Главная" 
-          component={HomeScreen} 
+          name="Создание" 
+          component={CreateTeacherScreen} 
           options={{
             headerTitle: () => (
-              <Text style={styles.headerTitle}>Main</Text>
-            ),
-          }}
-        />
-      <Tab.Screen
-          name="Профиль"
-          component={ProfileScreen}
-          options={{
-            headerTitle: () => (
-              <Text style={styles.headerTitle}>Profile</Text>
+              <Text style={styles.headerTitle}>Создание</Text>
             ),
           }}
         />

@@ -58,7 +58,7 @@ const  StudentNavigation = () => {
           component={LearningScreen}
           options={{
             headerTitle: () => (
-              <Text style={styles.headerTitle}>Learning</Text>
+              <Text style={styles.headerTitle}>Обучение</Text>
             ),
           }}
         />
@@ -67,7 +67,7 @@ const  StudentNavigation = () => {
           component={HomeScreen} 
           options={{
             headerTitle: () => (
-              <Text style={styles.headerTitle}>Main</Text>
+              <Text style={styles.headerTitle}>Главная</Text>
             ),
           }}
         />
@@ -76,7 +76,7 @@ const  StudentNavigation = () => {
           component={ProfileScreen}
           options={{
             headerTitle: () => (
-              <Text style={styles.headerTitle}>Profile</Text>
+              <Text style={styles.headerTitle}>Профиль</Text>
             ),
             // headerRight: () => (
             //   <Button title='Exit' onPress={handleLogout} style={styles.headerTitle} />

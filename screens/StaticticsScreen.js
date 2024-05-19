@@ -27,13 +27,16 @@ const ProfileScreen = ({ navigation }) => {
                 setDictionary(dict);
                 const userId = auth.currentUser.uid; // Get current user's UID
                 const userDocRef = doc(db, "teacherTests", userId);
+                const teacherDocRef = doc(db, "users", userId);
                 try {
+                    const teacherDoc = await getDoc(teacherDocRef);
                     const userDoc = await getDoc(userDocRef);
-                    if (userDoc.exists()) {
-                        setUserProfile(userDoc.data());
-                        if(userDoc.data().tests){
-                          setUserTests(userDoc.data().tests.reverse());
-                        }
+                    if(userDoc.exists()){
+                      setUserTests(userDoc.data().tests.reverse());
+                    }
+                    if (teacherDoc.exists()) {
+                        setUserProfile(teacherDoc.data());
+                        
                     } else {
                         console.log('No such document!');
                     }
@@ -52,6 +55,10 @@ const ProfileScreen = ({ navigation }) => {
 
     const checkStatistics = (id) => {
       navigation.navigate('Список оценок', { id });
+    }
+
+    const addStudents = () => {
+      navigation.navigate('Студенты');
     }
 
     const handleLogout = () => {
@@ -85,13 +92,17 @@ const ProfileScreen = ({ navigation }) => {
                     </TouchableOpacity>
                     <View>
                       <Text style={styles.name}>{userProfile.name} {userProfile.surname}</Text>
-                      <Text style={styles.info}>Группа : СП141</Text>
-                      <Text style={styles.info}>Преподаватель: Горбадей О. Ю.</Text>
                     </View>
                     
                     
                   </View>
+                  
                 </View>
+                <View>
+                  <TouchableOpacity onPress={() => addStudents()} style={styles.activity2}>
+                    <Text style={styles.activity_text}>Добавить людей в группу</Text>
+                  </TouchableOpacity>
+                  </View>
                 {userTests
                   ?
                   <>
@@ -145,12 +156,14 @@ const ProfileScreen = ({ navigation }) => {
     mainInfo: {
       flex: 1,
       flexDirection: 'row',
+      flexGrow:1,
       // backgroundColor:'purple'
     },
     scroll:{
       flex:1,
       flexDirection: 'column',
       alignItems:'center',
+      flexGrow:2,
       // backgroundColor: 'blue',
     },
     scroll2:{
@@ -160,7 +173,7 @@ const ProfileScreen = ({ navigation }) => {
       maxWidth: '90%',
       minWidth: '90%',
       width: '90%',
-      flexGrow:3,
+      flexGrow:1,
       // width: 'auto',
     },
     scrollStyle:{
@@ -177,6 +190,23 @@ const ProfileScreen = ({ navigation }) => {
       minHeight: 80,
       borderRadius: 20,
       marginBottom: 10,
+      padding: 10,
+      backgroundColor: '#F0F0F0',
+      
+    },  
+    activity2:{
+      flex:1,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      alignSelf: 'flex-start',
+      minWidth: '85%',
+      maxWidth: '85%',
+      minHeight: 50,
+      maxHeight: 80,
+      borderRadius: 20,
+      marginBottom: 10,
+      marginTop: 30,
       padding: 10,
       backgroundColor: '#F0F0F0',
       
