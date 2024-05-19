@@ -1,8 +1,8 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import HomeScreen from '../screens/HomeScreen';
+import CreatingTestsScreen from '../screens/CreatingTestsScreen';
 import LearningScreen from '../screens/LearningScreen.js';
-import ProfileScreen from '../screens/ProfileScreen';
+import StaticticsScreen from '../screens/StaticticsScreen';
 
 import {StyleSheet, Image, Text} from 'react-native';
 
@@ -64,7 +64,7 @@ const  TeacherNavigation = () => {
         />
       <Tab.Screen 
           name="Статистика" 
-          component={HomeScreen} 
+          component={StaticticsScreen} 
           options={{
             headerTitle: () => (
               <Text style={styles.headerTitle}>Statistics</Text>
@@ -73,7 +73,7 @@ const  TeacherNavigation = () => {
         />
       <Tab.Screen
           name="Тесты"
-          component={ProfileScreen}
+          component={CreatingTestsScreen}
           options={{
             headerTitle: () => (
               <Text style={styles.headerTitle}>Tests</Text>

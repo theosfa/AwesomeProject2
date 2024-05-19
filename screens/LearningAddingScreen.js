@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Button, Alert } from 'react-native';
 import { auth, db } from '../firebaseConfig';
 import { doc, collection, addDoc, getDocs } from 'firebase/firestore';
 
-const LearningScreen = ({ navigation }) => {
+const LearningAddingScreen = ({ navigation }) => {
     const lectures = [
         {
             "materials" : [
@@ -161,4 +161,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default LearningScreen;
+export default LearningAddingScreen;

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, Alert } from 'react-native';
+import { View, TextInput, ScrollView, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../firebaseConfig';
 
 const SignupScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
@@ -9,79 +10,102 @@ const SignupScreen = ({ navigation }) => {
     const [username, setUsername] = useState('');
     const [name, setName] = useState('');
     const [surname, setSurname] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+    const [anyError, setAnyError] = useState(false);
 
-    const auth = getAuth();
-    const db = getFirestore();
-
-    const handleSignUp = () => {
-        createUserWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                // Signed in 
+    const handleSignUp = async () => {
+        try {
+            // Check if the username already exists
+            const testRef = doc(db, 'students', username);
+            const testSnapshot = await getDoc(testRef);
+            if (testSnapshot.exists()) {
+                console.log(testSnapshot.data())
+                setAnyError(true);
+                setErrorMessage("Username already exists.");
+                return;
+            }else {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-                // Add a new document in collection "users"
                 const userRef = doc(db, "users", user.uid);
-                setDoc(userRef, {
+                await setDoc(userRef, {
                     username: username,
                     name: name,
                     surname: surname,
                     email: email,
                     permission: 'student',
-                })
-                .then(() => {
-                    Alert.alert("User registered successfully!");
-                    navigation.navigate('Login'); // Navigate to login screen or anywhere you need
-                })
-                .catch((error) => {
-                    console.error("Error adding document: ", error);
-                    Alert.alert("Error adding user details to database.");
                 });
-            })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                Alert.alert(errorMessage);
-            });
+                await setDoc(testRef, {
+                    id: user.uid,
+                    name: name,
+                    surname: surname,
+                    username: username,
+                });
+
+                navigation.navigate('Login'); // Navigate to the login screen
+            }
+        
+        } catch (error) {
+            setAnyError(true);
+            setErrorMessage(error.message);
+        }
     };
 
     return (
         <View style={styles.container}>
+            <ScrollView 
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+            >
+            <View style={styles.container}>
+            <Image source={require('../assets/images/preview.png')} style={styles.image} />
+
             <TextInput
-                placeholder="Username"
+                placeholder="Никнейм"
                 value={username}
                 onChangeText={setUsername}
                 style={styles.input}
             />
             <TextInput
-                placeholder="Name"
+                placeholder="Имя"
                 value={name}
                 onChangeText={setName}
                 style={styles.input}
             />
             <TextInput
-                placeholder="Surname"
+                placeholder="Фамилия"
                 value={surname}
                 onChangeText={setSurname}
                 style={styles.input}
             />
             <TextInput
-                placeholder="Email"
+                placeholder="Ел. почта"
                 value={email}
                 onChangeText={setEmail}
                 style={styles.input}
                 autoCapitalize="none"
             />
             <TextInput
-                placeholder="Password"
+                placeholder="Пароль"
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
                 style={styles.input}
             />
-            <Button title="Sign Up" onPress={handleSignUp} />
-            <Button
-                title="Already have an account? Log In"
-                onPress={() => navigation.navigate('Login')}
-            />
+            {anyError && (
+                <Text style={styles.errorText}>
+                    {errorMessage}
+                </Text>
+            )}
+            <TouchableOpacity onPress={handleSignUp} style={styles.register} >
+                <Text style={styles.text}>Зарегистрироваться</Text>
+            </TouchableOpacity>
+            <View style={styles.login}>
+            <Text style={styles.textLogin1}>Уже есть аккаунт? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}  >
+                <Text style={styles.textLogin} >Войти</Text>
+            </TouchableOpacity>
+            </View></View>
+            </ScrollView>
         </View>
     );
 };
@@ -91,14 +115,56 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20
+        // padding: 20,
+        backgroundColor: "#fff",
+    },
+    image:{
+        marginTop: 50,
+        height: 250,
+        width: 250,
+        marginBottom: 30,
     },
     input: {
-        width: '90%',
-        height: 40,
+        width: '85%',
+        height: 45,
         marginVertical: 10,
-        borderWidth: 1,
+        // borderWidth: 1,
+        borderRadius: 100,
+        backgroundColor: "#F0F0F0",
+        paddingLeft: 25,
         padding: 10,
+    },
+    errorText: {
+        color: 'red',
+        marginBottom: 10,
+    },
+    login:{
+        flex: 1,
+        flexDirection: "row",
+        flexWrap: 'nowrap',
+        marginTop:5,
+    },
+    register: {
+        backgroundColor: "#000",
+        // height: 50,
+        maxHeight: 50,
+        minHeight: 50,
+        width: '85%',
+        flex: 1,
+        marginTop: 25,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    text:{
+        color: 'white',
+        fontFamily: 'Poppins-Bold',
+        fontSize: 20,
+    },
+    textLogin:{
+        color:'#808080'
+    },
+    textLogin1:{
+        color:'#000'
     }
 });
 

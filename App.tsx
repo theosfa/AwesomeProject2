@@ -28,6 +28,7 @@ import { doc, collection, getDoc, getDocs } from 'firebase/firestore';
 import SignInScreen from './screens/LoginScreen';
 import SignupScreen from './screens/SignupScreen';
 import TestScreen from './screens/TestScreen';
+import StudentsMarksListScreen from './screens/StudentsMarksListScreen';
 import LectureListScreen from './screens/LectureListScreen';
 import LoadingScreen from './screens/LoadingScreen';
 
@@ -141,7 +142,7 @@ const App = (): React.JSX.Element => {
               {userPermission === 'student' ? (
                 <>
                   <Stack.Screen name="Home" component={StudentNavigation} options={{ headerShown: false }} />
-                  <Stack.Screen name="Test" component={TestScreen} />
+                  <Stack.Screen name="Тест" component={TestScreen} />
                   <Stack.Screen name="Лекция" component={LectureListScreen} />
                 </>
               ) : (
@@ -149,13 +150,13 @@ const App = (): React.JSX.Element => {
                 {userPermission === 'teacher' ? (
                   <>
                     <Stack.Screen name="Home" component={TeacherNavigation} options={{ headerShown: false }} />
-                    <Stack.Screen name="Test" component={TestScreen} />
+                    <Stack.Screen name="Список оценок" component={StudentsMarksListScreen} />
                     <Stack.Screen name="Лекция" component={LectureListScreen} />
                   </>
                 ) : (
                   <>
                     <Stack.Screen name="Home" component={AdminNavigation} options={{ headerShown: false }} />
-                    <Stack.Screen name="Test" component={TestScreen} />
+                    <Stack.Screen name="Тест" component={TestScreen} options={{ headerShown: false }}/>
                     <Stack.Screen name="Лекция" component={LectureListScreen} />
                   </>
                 )}

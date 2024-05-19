@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { auth, db } from '../firebaseConfig'; // Update this path if necessary
 import { collection, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { TouchableOpacity } from 'react-native-gesture-handler'; // Import TouchableOpacity for buttons
@@ -52,9 +52,11 @@ const LectureListScreen = ({ route, navigation }) => {
         <View style={styles.container}>
             <View>
                 <Text style={styles.title}>{title}</Text>
-                <View style={styles.questionContainer}>
                     <Text style={styles.question}>{sections.title}</Text>
-                    <View style={styles.optionsContainer}>
+                    <ScrollView 
+                        showsVerticalScrollIndicator={false}
+                        showsHorizontalScrollIndicator={false}
+                    >
                     {sections.map((item, index) => {
                         return <View key={index}>
                             <TouchableOpacity onPress={()=> handleOpenTitle(index)} style={styles.optionButton}>
@@ -70,8 +72,7 @@ const LectureListScreen = ({ route, navigation }) => {
                             </View>
                         </View>
                     })}
-                    </View>
-                </View>
+                </ScrollView>
             </View>
         </View>
     );
@@ -128,28 +129,50 @@ const LectureListScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20
+        padding: 20,
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        backgroundColor: '#fff'
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 20
+        marginBottom: 20,
+        color: 'black',
     },
     questionContainer: {
         marginBottom: 20
     },
     question: {
         fontSize: 18,
-        marginBottom: 10
+        marginBottom: 10,
+        color: 'black',
     },
     optionsContainer: {
-        marginLeft: 20
+        // flex:1,
+        // justifyContent: 'center',
+        // alignItems: 'flex-start',
+        marginLeft: 20,
+        backgroundColor: 'black',
     },
     optionButton: {
-        marginBottom: 10,
+        minWidth: '95%',
+        maxWidth: '95%',
+        maxHeight: 80,
+        minHeight: 50,
+        // marginBottom: 30,
+        // borderWidth: 1,
         padding: 10,
-        borderWidth: 1,
-        borderRadius: 5
+        borderRadius: 20,
+        backgroundColor: '#F0F0F0',
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    optionStyle:{
+        color: 'black',
+        fontSize:18,
+        fontFamily:'Poppins-Bold',
     },
     restartContainer:{
         flex:1,
@@ -157,31 +180,39 @@ const styles = StyleSheet.create({
         justifyContent:'center',
     },
     showScore:{
-    fontSize:24,
+        fontSize:40,
+        fontFamily:'Poppins-Bold',
+        color: 'black',
+    },
+    showScore2:{
+        fontSize:24,
+        fontFamily:'Poppins-Bold',
+        color: 'white',
+        // backgroundColor:'red',
+        alignSelf: 'center',
     },
     restart:{
-        flexDirection: 'row',
-        justifyContent: 'center',
+        backgroundColor: "#000",
+        // height: 50,
+        maxHeight: 60,
+        minHeight: 50,
+        width: '85%',
+        flex: 1,
+        marginTop: 25,
         alignItems: 'center',
-        width: '80%',
-        height:75,
-        backgroundColor:'#F5F5F5',
-        borderRadius:10,
-        marginBottom:5,
-        paddingLeft: 7,
-        paddingRight: 15, 
-    },
+        justifyContent: 'center',
+        padding: 10,
+        paddingBottom: 12,
+      },
     textStyle: {
-        fontSize: 16,
-        color: '#333',
-        marginTop: 5,
+        
         display: 'none',
-        margin: 10,
+        
     },
     selectedTextStyle: {
         fontSize: 16,
-        // color: 'blue', // Change the color when selected
-        // fontWeight: 'bold', // Change the weight when selected
+        color: '#333',
+        marginTop: 50,
         display: 'visible',
     }
 });

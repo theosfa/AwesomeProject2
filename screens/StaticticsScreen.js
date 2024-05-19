@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, ActivityIndicator, Alert , Image, TouchableOpacity } from 'react-native';
 import {  GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useIsFocused } from '@react-navigation/native';
+import { NavigationContainerRefContext, useIsFocused } from '@react-navigation/native';
 import { auth, db } from '../firebaseConfig'; // Ensure this path is correct
 import { doc, collection, getDoc, getDocs } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import {Hr} from 'react-native-hr';
 
-const ProfileScreen = () => {
+const ProfileScreen = ({ navigation }) => {
     const [userProfile, setUserProfile] = useState(null);
     const [userTests, setUserTests] = useState(null);
     const [dictionary, setDictionary] = useState(null);
@@ -26,7 +26,7 @@ const ProfileScreen = () => {
                   }, {});
                 setDictionary(dict);
                 const userId = auth.currentUser.uid; // Get current user's UID
-                const userDocRef = doc(db, "users", userId);
+                const userDocRef = doc(db, "teacherTests", userId);
                 try {
                     const userDoc = await getDoc(userDocRef);
                     if (userDoc.exists()) {
@@ -34,7 +34,6 @@ const ProfileScreen = () => {
                         if(userDoc.data().tests){
                           setUserTests(userDoc.data().tests.reverse());
                         }
-                        
                     } else {
                         console.log('No such document!');
                     }
@@ -49,6 +48,11 @@ const ProfileScreen = () => {
             fetchUserProfile(); // Fetch data when the screen is focused
         }
     }, [isFocused]);
+
+
+    const checkStatistics = (id) => {
+      navigation.navigate('Список оценок', { id });
+    }
 
     const handleLogout = () => {
         signOut(auth).then(() => {
@@ -100,13 +104,9 @@ const ProfileScreen = () => {
                     style={styles.scrollStyle}
                     >
                       {userTests.map((item, index) => {
-                        return <View style={styles.activity} key={index}>
+                        return <TouchableOpacity onPress={() => checkStatistics(item.id)} style={styles.activity} key={index}>
                             <Text style={styles.activity_text}> {dictionary[item.id]}</Text>
-                            <View style={styles.activity_grade}>
-                              <Text style={styles.activity_grade_text}> {item.score} </Text>
-                              <Text style={styles.activity_grade_text}> % </Text>
-                            </View>
-                        </View>
+                        </TouchableOpacity>
                       })}
                       
                     </ScrollView>

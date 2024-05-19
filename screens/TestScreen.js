@@ -60,23 +60,31 @@ const TestScreen = ({ route, navigation }) => {
         if (auth.currentUser) {
             const userId = auth.currentUser.uid;
             const userDocRef = doc(db, "users", userId);
+            const testRef = doc(db, 'tests', id);
             try {
+                const testSnapshot = await getDoc(testRef);
                 const userDoc = await getDoc(userDocRef);
                 let newTests = [];
+                let newMarks = [];
                 if (userDoc.exists()) {
+                    const testData = testSnapshot.data();
+                    const marks = testData.marks || [];
                     const userData = userDoc.data();
                     const tests = userData.tests || [];
-                    newTests = [...tests, { id: id, score: Number(percentage.toFixed()) }];  // Replace 'test-id' and 'score' with actual values
+                    newTests = [...tests, { id: id, score: Number(percentage.toFixed()) }];
+                    newMarks =  [...marks, { id: userDoc.data().username, score: Number(percentage.toFixed()) }]; // Replace 'test-id' and 'score' with actual values
                 } else {
-                    newTests = [{ id: id, score: Number(percentage.toFixed()) }];  // Replace 'test-id' and 'score' with actual values
+                    newTests = [{ id: id, score: Number(percentage.toFixed()) }];
+                    newMarks =  [{ id: userDoc.data().username, score: Number(percentage.toFixed()) }]  // Replace 'test-id' and 'score' with actual values
                 }
                 await updateDoc(userDocRef, {
                     tests: newTests,
                 });
-                Alert.alert("Profile Updated", "Your profile has been updated successfully.");
+                await updateDoc(testRef, {
+                    marks: newMarks,
+                });
             } catch (error) {
                 console.error("Error updating user details:", error);
-                Alert.alert("Update Failed", error.message);
             }
             navigation.navigate('Главная');
         }
@@ -93,25 +101,25 @@ const TestScreen = ({ route, navigation }) => {
             showScore 
             ? 
                 <View style={styles.restartContainer}>
-                <Text style={styles.showScore}> {score}/{maxScore} </Text>
-                <TouchableOpacity onPress={handleUpdateProfile} style={styles.restart}>
-                    <Text> Завершить тест</Text>
-                </TouchableOpacity>
+                    <Text style={styles.showScore}> {Number((score*100/maxScore).toFixed())} % </Text>
+                    <TouchableOpacity onPress={handleUpdateProfile} style={styles.restart}>
+                        <Text style={styles.showScore2}> Завершить тест</Text>
+                    </TouchableOpacity>
                 </View> 
                 :
                 <View>
                 <Text style={styles.title}>{title}</Text>
-                <View style={styles.questionContainer}>
+                {/* <View style={styles.questionContainer}> */}
                     <Text style={styles.question}>{questions[currentQuestionIndex].question}</Text>
-                    <View style={styles.optionsContainer}>
-                    {questions[currentQuestionIndex]?.options.map((item) => {
-                        return <TouchableOpacity onPress={()=> handleAnswer(item)} style={styles.optionButton}>
-                        <Text style={styles.optionStyle}> {item} </Text>
-                        </TouchableOpacity>
-                    })}
+                    {/* <View style={styles.optionsContainer}> */}
+                        {questions[currentQuestionIndex]?.options.map((item) => {
+                            return <TouchableOpacity onPress={()=> handleAnswer(item)} style={styles.optionButton}>
+                                <Text style={styles.optionStyle}> {item} </Text>
+                            </TouchableOpacity>
+                        })}
                     </View>
-                </View>
-                </View>
+                // </View>
+                // </View>
             } 
         </View>
     );
@@ -120,28 +128,48 @@ const TestScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20
+        padding: 20,
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        backgroundColor: '#fff'
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 20
+        marginBottom: 20,
+        color: 'black',
     },
     questionContainer: {
         marginBottom: 20
     },
     question: {
         fontSize: 18,
-        marginBottom: 10
+        marginBottom: 10,
+        color: 'black',
     },
     optionsContainer: {
-        marginLeft: 20
+        // flex:1,
+        // justifyContent: 'center',
+        // alignItems: 'flex-start',
+        marginLeft: 20,
+        backgroundColor: 'black',
     },
     optionButton: {
+        minWidth: '95%',
+        maxWidth: '95%',
+        maxHeight: 80,
+        minHeight: 50,
         marginBottom: 10,
+        // borderWidth: 1,
         padding: 10,
-        borderWidth: 1,
-        borderRadius: 5
+        borderRadius: 20,
+        backgroundColor: '#F0F0F0',
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    optionStyle:{
+        color: 'black',
     },
     restartContainer:{
         flex:1,
@@ -149,19 +177,29 @@ const styles = StyleSheet.create({
         justifyContent:'center',
     },
     showScore:{
-    fontSize:24,
+        fontSize:40,
+        fontFamily:'Poppins-Bold',
+        color: 'black',
+    },
+    showScore2:{
+        fontSize:24,
+        fontFamily:'Poppins-Bold',
+        color: 'white',
+        // backgroundColor:'red',
+        alignSelf: 'center',
     },
     restart:{
-        flexDirection: 'row',
-        justifyContent: 'center',
+        backgroundColor: "#000",
+        // height: 50,
+        maxHeight: 60,
+        minHeight: 50,
+        width: '85%',
+        flex: 1,
+        marginTop: 25,
         alignItems: 'center',
-        width: '80%',
-        height:75,
-        backgroundColor:'#F5F5F5',
-        borderRadius:10,
-        marginBottom:5,
-        paddingLeft: 7,
-        paddingRight: 15, 
+        justifyContent: 'center',
+        padding: 10,
+        paddingBottom: 12,
       },
 });
 
