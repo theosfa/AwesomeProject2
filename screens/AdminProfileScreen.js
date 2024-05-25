@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, ActivityIndicator, Alert , Image, TouchableOpacity } from 'react-native';
 import {  GestureHandlerRootView } from 'react-native-gesture-handler';
-import { NavigationContainerRefContext, useIsFocused } from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native';
 import { auth, db } from '../firebaseConfig'; // Ensure this path is correct
 import { doc, collection, getDoc, getDocs } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import {Hr} from 'react-native-hr';
 
-const ProfileScreen = ({ navigation }) => {
+const AdminProfileScreen = ({ navigation }) => {
     const [userProfile, setUserProfile] = useState(null);
-    const [userTests, setUserTests] = useState(null);
+    const [teacher, setTeacher] = useState(null);
     const [dictionary, setDictionary] = useState(null);
     const [loading, setLoading] = useState(true);
     const isFocused = useIsFocused();
@@ -18,25 +18,24 @@ const ProfileScreen = ({ navigation }) => {
     useEffect(() => {
         const fetchUserProfile = async () => {
             if (auth.currentUser) {
-                const testsCollectionRef = collection(db, 'tests');
+                const testsCollectionRef = collection(db, "users");
                 const snapshot = await getDocs(testsCollectionRef);
                 const dict = snapshot.docs.reduce((acc, doc) => {
-                    acc[doc.id] = doc.data().title;
+                  if (doc.data().permission === "teacher"){
+                    acc[doc.id] = {name : doc.data().name, surname : doc.data().surname};
+                  }
                     return acc;
                   }, {});
-                setDictionary(dict);
+
+                const dictionaryArray = Object.entries(dict).map(([uid, userInfo]) => ({ uid, ...userInfo }));
+                setTeacher(dictionaryArray);
+                dictionaryArray.map(item => {console.log(item.name)})
                 const userId = auth.currentUser.uid; // Get current user's UID
-                const userDocRef = doc(db, "teacherTests", userId);
-                const teacherDocRef = doc(db, "users", userId);
+                const userDocRef = doc(db, "users", userId);
                 try {
-                    const teacherDoc = await getDoc(teacherDocRef);
                     const userDoc = await getDoc(userDocRef);
-                    if(userDoc.exists()){
-                      setUserTests(userDoc.data().tests.reverse());
-                    }
-                    if (teacherDoc.exists()) {
-                        setUserProfile(teacherDoc.data());
-                        
+                    if (userDoc.exists()) {
+                        setUserProfile(userDoc.data());
                     } else {
                         console.log('No such document!');
                     }
@@ -52,15 +51,6 @@ const ProfileScreen = ({ navigation }) => {
         }
     }, [isFocused]);
 
-
-    const checkStatistics = (id) => {
-      navigation.navigate('Список оценок', { id });
-    }
-
-    const addStudents = () => {
-      navigation.navigate('Группы');
-    }
-
     const handleLogout = () => {
         signOut(auth).then(() => {
             // Sign-out successful.
@@ -70,6 +60,10 @@ const ProfileScreen = ({ navigation }) => {
             // Alert.alert("Logout Failed", error.message);
         });
     };
+
+    const openTeachersList = () => {
+      navigation.navigate("Преподаватели");
+    }
 
     if (loading) {
         return <ActivityIndicator size="large" color="#0000ff" />;
@@ -93,17 +87,14 @@ const ProfileScreen = ({ navigation }) => {
                     <View>
                       <Text style={styles.name}>{userProfile.name} {userProfile.surname}</Text>
                     </View>
+                    
+                    
                   </View>
                 </View>
-                <View>
-                  <TouchableOpacity onPress={() => addStudents()} style={styles.activity2}>
-                    <Text style={styles.activity_text}>Добавить людей в группу</Text>
-                  </TouchableOpacity>
-                  </View>
-                {userTests
+                {dictionary
                   ?
                   <>
-                  <Text style={styles.name}>Последняя активность</Text>
+                  <Text style={styles.name}>Список Преподавателей</Text>
                   <View style={styles.scroll2}>
                     
                   <ScrollView 
@@ -111,10 +102,12 @@ const ProfileScreen = ({ navigation }) => {
                     showsHorizontalScrollIndicator={false}
                     style={styles.scrollStyle}
                     >
-                      {userTests.map((item, index) => {
-                        return <TouchableOpacity onPress={() => checkStatistics(item.id)} style={styles.activity} key={index}>
-                            <Text style={styles.activity_text}> {dictionary[item.id]}</Text>
-                        </TouchableOpacity>
+                      {dictionary.map((item, index) => {
+                        return <View style={styles.activity} key={index}>
+                            <Text style={styles.teacherInfoBold}> {item.name}</Text>
+                            <Text style={styles.teacherInfoBold}> {item.surname} </Text>
+                            <Text style={styles.teacherInfo}> {item.uid} </Text>
+                        </View>
                       })}
                       
                     </ScrollView>
@@ -150,17 +143,23 @@ const ProfileScreen = ({ navigation }) => {
       // backgroundColor: '#ccf3ff',
       
     },
+    teacherInfo: {
+      fontFamily: 'Poppins-Regular',
+      fontSize: 15,
+    },
+    teacherInfoBold: {
+      fontFamily: 'Poppins-Bold',
+      fontSize: 15,
+    },
     mainInfo: {
       flex: 1,
       flexDirection: 'row',
-      flexGrow:1,
       // backgroundColor:'purple'
     },
     scroll:{
       flex:1,
       flexDirection: 'column',
       alignItems:'center',
-      flexGrow:2,
       // backgroundColor: 'blue',
     },
     scroll2:{
@@ -170,7 +169,7 @@ const ProfileScreen = ({ navigation }) => {
       maxWidth: '90%',
       minWidth: '90%',
       width: '90%',
-      flexGrow:1,
+      flexGrow:3,
       // width: 'auto',
     },
     scrollStyle:{
@@ -180,30 +179,14 @@ const ProfileScreen = ({ navigation }) => {
     activity:{
       flex:1,
       flexDirection: 'row',
-      justifyContent: 'space-between',
+      flexWrap: 'wrap',
+      // justifyContent: 'space-between',
       alignItems: 'center',
       minWidth: '95%',
       maxWidth: '95%',
       minHeight: 80,
       borderRadius: 20,
       marginBottom: 10,
-      padding: 10,
-      backgroundColor: '#F0F0F0',
-      
-    },  
-    activity2:{
-      flex:1,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      alignSelf: 'flex-start',
-      minWidth: '85%',
-      maxWidth: '85%',
-      minHeight: 50,
-      maxHeight: 80,
-      borderRadius: 20,
-      marginBottom: 10,
-      marginTop: 30,
       padding: 10,
       backgroundColor: '#F0F0F0',
       
@@ -300,4 +283,4 @@ const ProfileScreen = ({ navigation }) => {
     },
   });
 
-  export default ProfileScreen;
+  export default AdminProfileScreen;

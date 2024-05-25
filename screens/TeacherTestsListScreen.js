@@ -1,36 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, ActivityIndicator, Alert } from 'react-native';
-import { db } from '../firebaseConfig'; // Update this path if necessary
+import { auth, db } from '../firebaseConfig'; // Update this path if necessary
 import { useIsFocused } from '@react-navigation/native';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, getDoc,doc } from 'firebase/firestore';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'; // Import TouchableOpacity for buttons
 import TestScreen from './TestScreen'; // Import TestScreen component
 
-const HomeScreen = ({ navigation }) => {
-    const [testTitles, setTestTitles] = useState([]);
-    const [testIds, setTestIds] = useState([]);
+const TeacherTestsListScreen = ({ route, navigation }) => {
+    const { id } = route.params;
+    const [tests, setTests] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isTests, setIsTests] = useState(false);
     const isFocused = useIsFocused();
+    const [dictionary, setDictionary] = useState(null);
+    const [group, setGroup] = useState('');
 
     useEffect(() => {
         const fetchTestTitles = async () => {
             try {
+                const userId = auth.currentUser.uid;
+                const userRef = doc(db, 'users', userId);
+                const userSnapshot = await getDoc(userRef);
+                const studentRef = doc(db, 'students', userSnapshot.data().username) ;
+                const groups = await getDoc(studentRef);
+                setGroup(groups.data().groups[groups.data().groups.findIndex(g => g.id === id)].group);
                 const testsCollectionRef = collection(db, 'tests');
                 const snapshot = await getDocs(testsCollectionRef);
-                let newTests = [];
-                const titles = snapshot.docs.map(doc => {
-                    if(doc.data().privacy != 'teacher') {
-                        newTests = [...newTests, doc.data().title ];
-                    } 
-                });
-                let newIds = [];
-                const ids = snapshot.docs.map(doc => {
-                    if(doc.data().privacy != 'teacher') {
-                        newIds = [...newIds, doc.id ];
-                    } 
-                });
-                setTestTitles(newTests);
-                setTestIds(newIds);
+                const dict = snapshot.docs.reduce((acc, doc) => {
+                    acc[doc.id] = doc.data().title;
+                    return acc;
+                  }, {});
+                setDictionary(dict);
+                console.log(id);
+                const teacherCollectionRef = doc(db, 'teacherTests', id);
+                const teacherSnapshot = await getDoc(teacherCollectionRef);
+                if (teacherSnapshot.exists()){
+                    const tests = teacherSnapshot.data().tests;
+                    console.log(tests);
+                    setTests(tests);
+                    setIsTests(true);
+                }
             } catch (error) {
                 console.error('Error fetching test titles:', error);
                 Alert.alert('Failed to fetch test titles.');
@@ -59,15 +68,19 @@ const HomeScreen = ({ navigation }) => {
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
             >
-            <Image
-                source={require('../assets/images/tests.png')} // Replace with your actual profile image source
-                style={styles.profileImage}
-            />
-            {testTitles.map((title, index) => (
-                <TouchableOpacity key={index} onPress={() => handleTestPress(testIds[index])}  style={styles.button}>
-                    <Text style={styles.button_text}>{title}</Text>
-                </TouchableOpacity>
-            ))}
+                {isTests ? (<>
+                    {tests.map((test, index) => (
+                        (group === test.group) ? (<>
+                            <TouchableOpacity key={index} onPress={() => handleTestPress(test.id)}  style={styles.button}>
+                            <Text style={styles.button_text}>{dictionary[test.id]}</Text>
+                        </TouchableOpacity>
+                            </>) : null
+                        
+                    ))}
+                </>) : (<>
+                    <Text>Преподаватель еще не добавил тестов.</Text>
+                </>)}
+            
             </ScrollView>
         </View>
     );
@@ -106,4 +119,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default HomeScreen;
+export default TeacherTestsListScreen;

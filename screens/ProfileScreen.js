@@ -7,7 +7,7 @@ import { doc, collection, getDoc, getDocs } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import {Hr} from 'react-native-hr';
 
-const ProfileScreen = () => {
+const ProfileScreen = ({ navigation }) => {
     const [userProfile, setUserProfile] = useState(null);
     const [userTests, setUserTests] = useState(null);
     const [dictionary, setDictionary] = useState(null);
@@ -60,6 +60,10 @@ const ProfileScreen = () => {
         });
     };
 
+    const openTeachersList = () => {
+      navigation.navigate("Преподаватели");
+    }
+
     if (loading) {
         return <ActivityIndicator size="large" color="#0000ff" />;
     }
@@ -82,7 +86,9 @@ const ProfileScreen = () => {
                     <View>
                       <Text style={styles.name}>{userProfile.name} {userProfile.surname}</Text>
                       <Text style={styles.info}>Группа : СП141</Text>
-                      <Text style={styles.info}>Преподаватель: Горбадей О. Ю.</Text>
+                      <TouchableOpacity  onPress={openTeachersList}>
+                        <Text style={styles.headerRight2}>Преподаватели</Text>
+                      </TouchableOpacity>
                     </View>
                     
                     

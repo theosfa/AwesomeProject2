@@ -30,18 +30,18 @@ const SignInScreen = () => {
                 showsHorizontalScrollIndicator={false}
             >
             <View style={styles.container}>
-            <Text style={styles.secondText}> Welcome back !</Text>
-            <Text style={styles.mainText}> OOP App</Text>
+            <Text style={styles.secondText}> Добро пожаловать</Text>
+            <Text style={styles.mainText}>Обучение ООП</Text>
             <Image source={require('../assets/images/preview.png')} style={styles.image} />
             <TextInput
-                placeholder="Email"
+                placeholder="Ел. почта"
                 value={email}
                 onChangeText={setEmail}
                 style={styles.input}
                 autoCapitalize="none"
             />
             <TextInput
-                placeholder="Password"
+                placeholder="Пароль"
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry

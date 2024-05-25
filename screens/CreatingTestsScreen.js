@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, Alert,TouchableOpacity, ScrollView } from 'react-native';
 import { auth, db } from '../firebaseConfig';
-import { doc, collection, addDoc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
+import { doc, collection, addDoc, getDoc, updateDoc, setDoc, setIndexConfiguration } from 'firebase/firestore';
 import RNPickerSelect from 'react-native-picker-select';
+import { set } from 'firebase/database';
 
 /* 
 Создать тест с n колвом ответов
@@ -10,16 +11,50 @@ import RNPickerSelect from 'react-native-picker-select';
 */
 
 const LearningAddingScreen = ({ navigation }) => {
+    const [teacherGroups, setTeacherGroups] = useState([]);
     const [questionTitle, setQuestionTitle] = useState('');
-    const [ans1, setAns1] = useState('');
-    const [ans2, setAns2] = useState('');
-    const [ans3, setAns3] = useState('');
-    const [ans4, setAns4] = useState('');
+    const [answers, setAnswers] = useState([]);
     const [ans, setAns] = useState('');
     const [title, setTitle] = useState('');
     const [isTest, setIsTest] = useState(false);
     const [test, setTest] = useState([])
-    const [inputHeight, setInputHeight] = useState(45); 
+    const [inputHeight, setInputHeight] = useState(45);
+    const [privacy, setPrivacy] = useState('teacher'); 
+    const [isPrivacy, setIsPrivacy] = useState(false);
+    const [correctAnswer, setCorrectAnswer] = useState('');
+    const [group, setGroup] = useState('');
+    const [isGroup, setIsGroup] = useState(false);
+
+    useEffect(() => {
+        const fetchTestQuestions = async () => {
+            try {
+                const userId = auth.currentUser.uid;
+                const teacherRef = doc(db, 'users', userId);
+                const teacherSnapshot = await getDoc(teacherRef);
+                const teacher = teacherSnapshot.data();
+                
+                if (teacher) {
+                    // Extract marks (student IDs and scores)
+                    const groups = teacher.groups;
+                    console.log(groups);
+                    // const studentIds = [...new Set(marks.map(mark => mark.id))];
+                    if (groups){
+                        console.log(groups);
+                        const teacherGroups = groups.map(group => group.id);
+                        setTeacherGroups(teacherGroups);
+                    }
+                } else {
+                    Alert.alert('Test not found');
+                }
+            } catch (error) {
+                console.error('Error fetching test questions:', error);
+                Alert.alert('Failed to fetch test questions.');
+            }
+        };
+
+        fetchTestQuestions();
+    }, []);
+
 
     
     const updateTest = async () => {
@@ -29,17 +64,30 @@ const LearningAddingScreen = ({ navigation }) => {
             const userDocRef = doc(db, "teacherTests", userId);
             try {
                 const userDoc = await getDoc(userDocRef);
-                const docRef = await addDoc(testsCollectionRef, { questions: test, title: title });
+                let docRef;
+                if (privacy === 'teacher'){
+                    docRef = await addDoc(testsCollectionRef, { questions: test, title: title, privacy: privacy, group: group });
+                } else {
+                    docRef = await addDoc(testsCollectionRef, { questions: test, title: title, privacy: privacy });
+                }
                 let newTests = [];
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
                     const tests = userData.tests || [];
-                    newTests = [...tests, { id: docRef.id }];
+                    if (privacy === 'teacher'){
+                        newTests = [...tests, { id: docRef.id, group: group }];
+                    } else {
+                        newTests = [...tests, { id: docRef.id }];
+                    }
                     await updateDoc(userDocRef, {
                         tests: newTests,
                     });  // Replace 'test-id' and 'score' with actual values
                 } else {
-                    newTests = [{ id: docRef.id }];
+                    if (privacy === 'teacher'){
+                        newTests = [{ id: docRef.id, group: group }];
+                    } else {
+                        newTests = [{ id: docRef.id }];
+                    }
                     await setDoc(userDocRef, {
                         tests: newTests,
                     });  // Replace 'test-id' and 'score' with actual values
@@ -53,6 +101,7 @@ const LearningAddingScreen = ({ navigation }) => {
             setTest([])
             setTitle('')
             setIsTest(false);
+            setIsPrivacy(false);
             navigation.navigate('Статистика');
         }
     };
@@ -65,16 +114,34 @@ const LearningAddingScreen = ({ navigation }) => {
     }
 
     const addQuestion = () => {
-        const newQuestion = { question : questionTitle, answer : ans, options : [ans1, ans2, ans3, ans4] };
+        const newQuestion = { question: questionTitle, answer: correctAnswer, options: answers.map(a => a.text) };
         setTest(prevTest => [...prevTest, newQuestion]);
-        setQuestionTitle('')
-        
-        setAns('')
-        setAns1('')
-        setAns2('')
-        setAns3('')
-        setAns4('')
-        console.log(test)
+        setQuestionTitle('');
+        setAnswers([{ text: '' }]); // Reset answers
+        setCorrectAnswer('');
+    }
+
+    const setPrivacyTest = (privacy) => {
+        setPrivacy(privacy);
+        setIsPrivacy(true);
+        if( privacy === 'teacher'){
+            setIsGroup(true);
+        }
+    }
+
+    const addAnswerField = () => {
+        setAnswers([...answers, { text: '' }]);
+    }
+
+    const updateAnswer = (text, index) => {
+        const newAnswers = answers.slice();
+        newAnswers[index].text = text;
+        setAnswers(newAnswers);
+    }
+
+    const chooseGroup = (id) => {
+        setGroup(id);
+        setIsGroup(false);
     }
     
 
@@ -98,39 +165,24 @@ const LearningAddingScreen = ({ navigation }) => {
             multiline={true}
             onContentSizeChange={(event) => setInputHeight(event.nativeEvent.contentSize.height)}
         />
+        {answers.map((item, index) => (
+            <TextInput
+                key={index}
+                placeholder={`Ответ ${index + 1}`}
+                value={item.text}
+                onChangeText={(text) => updateAnswer(text, index)}
+                style={styles.input}
+            />
+        ))}
+        <TouchableOpacity onPress={addAnswerField} style={styles.register}>
+            <Text style={styles.textLogin}>Добавить вариант ответа</Text>
+        </TouchableOpacity>
         <TextInput
-            placeholder="Ответ 1"
-            value={ans1}
-            onChangeText={setAns1}
-            style={styles.input}
-        />
-        <TextInput
-            placeholder="Ответ 2"
-            value={ans2}
-            onChangeText={setAns2}
-            style={styles.input}
-        />
-        <TextInput
-            placeholder="Ответ 3"
-            value={ans3}
-            onChangeText={setAns3}
-            style={styles.input}
-            autoCapitalize="none"
-        />
-        <TextInput
-            placeholder="Ответ 4"
-            value={ans4}
-            onChangeText={setAns4}
-            // secureTextEntry
-            style={styles.input}
-        />
-         <TextInput
-            placeholder="Правильний ответ"
-            value={ans}
-            onChangeText={setAns}
-            // secureTextEntry
-            style={styles.input}
-        />
+                        placeholder="Правильний ответ"
+                        value={correctAnswer}
+                        onChangeText={setCorrectAnswer}
+                        style={styles.input}
+                    />
             <TouchableOpacity onPress={addQuestion} style={styles.register} >
                 <Text style={styles.textLogin} >Добавить вопрос</Text>
             </TouchableOpacity>
@@ -139,16 +191,47 @@ const LearningAddingScreen = ({ navigation }) => {
             </TouchableOpacity>
             </ScrollView>
         </>) : (<>
-            <TextInput
-                placeholder="Название теста"
-                value={title}
-                onChangeText={setTitle}
-                // secureTextEntry
-                style={styles.inputMain}
-            />
-            <TouchableOpacity onPress={createTest} style={styles.registerMain} >
-                <Text style={styles.textLogin} >Создать тест</Text>
-            </TouchableOpacity>
+            {isPrivacy ? (<>
+                {isGroup ? (<>
+                    <ScrollView 
+                        showsVerticalScrollIndicator={false}
+                        showsHorizontalScrollIndicator={false}
+                        style={styles.scrollStyle}
+                        alignItems={'center'}
+                    >
+                        {teacherGroups.length > 0 ? (
+                            teacherGroups.map((group, index) => (
+                                <View style={styles.optionButton} key={index}>
+                                    <TouchableOpacity onPress={() => chooseGroup(group)} >
+                                        <Text style={styles.optionStyle} > Группа: {group}</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            ))
+                        ) : (
+                            <Text>No group found.</Text>
+                        )}
+                    </ScrollView>
+                </>) : (<>
+                    <TextInput
+                        placeholder="Название теста"
+                        value={title}
+                        onChangeText={setTitle}
+                        // secureTextEntry
+                        style={styles.inputMain}
+                    />
+                    <TouchableOpacity onPress={createTest} style={styles.registerMain} >
+                        <Text style={styles.textLogin} >Создать тест</Text>
+                    </TouchableOpacity>
+                </>)}
+            </>) : (<>
+                <TouchableOpacity onPress={() => setPrivacyTest('public')} style={styles.registerMain} >
+                    <Text style={styles.textLogin} >Создать публичный тест</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setPrivacyTest('teacher')} style={styles.registerMain} >
+                    <Text style={styles.textLogin} >Создать приватный тест</Text>
+                </TouchableOpacity>
+            </>)}
+            
         </>)}
         
         </View>
@@ -162,7 +245,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         // padding: 20,
         padding: 0,
-        margin: 0,
+        paddingTop: 20,
         backgroundColor: '#fff',
     },
     scroll: {
@@ -171,6 +254,26 @@ const styles = StyleSheet.create({
         margin: 0,
         
         // backgroundColor: 'green'
+    },
+    optionButton: {
+        minWidth: '95%',
+        maxWidth: '95%',
+        maxHeight: 100,
+        minHeight: 50,
+        marginBottom: 10,
+        // borderWidth: 1,
+        padding: 10,
+        borderRadius: 20,
+        backgroundColor: '#F0F0F0',
+        flex: 1,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    optionStyle:{
+        color: 'black',
+        fontSize: 20,
     },
     button: {
         fontSize: 18,
@@ -243,6 +346,22 @@ const styles = StyleSheet.create({
         backgroundColor: "#F0F0F0",
         paddingLeft: 25,
         padding: 10,
+    },
+    textLogin3:{
+        color:'#fff',
+        fontSize: 20,
+        fontFamily: 'Poppins-Bold'
+    },
+    register3: {
+        backgroundColor: "#000",
+        // height: 50,
+        maxHeight: 50,
+        minHeight: 50,
+        minwidth: '100%',
+        flex: 1,
+        marginTop: '5%',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
 });
 

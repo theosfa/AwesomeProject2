@@ -4,62 +4,78 @@ import { auth, db } from '../firebaseConfig'; // Update this path if necessary
 import { collection, doc, getDoc, updateDoc, query, where, getDocs } from 'firebase/firestore';
 import { TouchableOpacity } from 'react-native-gesture-handler'; // Import TouchableOpacity for buttons
 
-const GroupStudentsListScreen = ({ route }) => {
-    const { group } = route.params;
-    const [students, setStudents] = useState([]);
+const StudentTeachersListScreen = ({ navigation }) => {
+    const [user, setUsers] = useState([]);
     const [username, setUserName] = useState('');
     const [loading, setLoading] = useState(true);
     const [refresh, setRefresh] = useState(false);
+    const [dictionary, setDictionary] = useState(null);
 
     useEffect(() => {
         const fetchTestQuestions = async () => {
             try {
                 const userId = auth.currentUser.uid;
-                const teacherRef = doc(db, 'users', userId);
-                const teacherSnapshot = await getDoc(teacherRef);
-                const teacher = teacherSnapshot.data();
+                const userRef = doc(db, 'users', userId);
+                const userSnapshot = await getDoc(userRef);
+                const userData = userSnapshot.data()
+                // setUsers(userData);
+                console.log(userData.username);
+                const username = userData.username;
                 
-                if (teacher) {
-                    // Extract marks (student IDs and scores)
-                    const marks = teacher.groups.find(mark => mark.id === group).students;
-                    console.log(group)
-                    console.log(marks)
-                    
-                    if (marks.length > 0) {
-                        const studentIds = [...new Set(marks)];
-                        console.log(studentIds)
-                        const studentsCollectionRef = collection(db, 'students');
-                        const q = query(studentsCollectionRef, where('__name__', 'in', studentIds));
-                        const querySnapshot = await getDocs(q);
-                        
-                        const studentsData = querySnapshot.docs.map(doc => ({
-                            id: doc.id,
-                            ...doc.data(),
-                        }));
+                const studentRef = doc(db, 'students', username);
+                const studentSnapshot = await getDoc(studentRef);
+                const studentData = studentSnapshot.data()
 
-                        const testsCollectionRef = collection(db, 'students');
-                        const snapshot = await getDocs(testsCollectionRef);
-                        const dict = snapshot.docs.reduce((acc, doc) => {
-                            acc[doc.id] = doc.data().id;
-                            return acc;
-                        }, {});
+                const testsCollectionRef = collection(db, 'users');
+                const snapshot = await getDocs(testsCollectionRef);
+                const dict = snapshot.docs.reduce((acc, doc) => {
+                    acc[doc.id] = { name : doc.data().name, surname : doc.data().surname};
+                    return acc;
+                  }, {});
+                setDictionary(dict);
+                console.log(dict["1KbSwveKrMe0QF7Q2ip9XOftzH23"].name);
+                console.log(studentData.groups)
+                setUsers(studentData.groups);
+
+                // if (user) {
+                //     // Extract marks (student IDs and scores)
+                //     const marks = user.group;
+                //     const studentIds = [...new Set(marks.map(mark => mark.id))];
+                    
+                //     if (studentIds.length > 0) {
+                //         const studentsCollectionRef = collection(db, 'students');
+                //         const q = query(studentsCollectionRef, where('__name__', 'in', studentIds));
+                //         const querySnapshot = await getDocs(q);
                         
-                        const studentsWithScores = marks.map(mark => {
-                            const studentData = studentsData.find(student => student.id === dict[mark]);
-                            console.log(mark)
-                            return {
-                                ...studentData,
-                                score: mark.score
-                            };
-                        });
+                //         const studentsData = querySnapshot.docs.map(doc => ({
+                //             id: doc.id,
+                //             ...doc.data(),
+                //         }));
+
+                //         const testsCollectionRef = collection(db, 'students');
+                //         const snapshot = await getDocs(testsCollectionRef);
+                //         const dict = snapshot.docs.reduce((acc, doc) => {
+                //             acc[doc.id] = doc.data().id;
+                //             return acc;
+                //         }, {});
+                //         console.log(dict)
                         
-                        setStudents(studentsWithScores.reverse());
-                    } else {
-                        setStudents([]);
-                    }
-                } else {
-                    Alert.alert('Test not found');
-                }
+                //         const studentsWithScores = marks.map(mark => {
+                //             const studentData = studentsData.find(student => student.id === dict[mark.id]);
+                //             // console.log(studentData)
+                //             return {
+                //                 ...studentData,
+                //                 score: mark.score
+                //             };
+                //         });
+                        
+                //         setStudents(studentsWithScores.reverse());
+                //     } else {
+                //         setStudents([]);
+                //     }
+                // } else {
+                //     Alert.alert('Test not found');
+                // }
             } catch (error) {
                 console.error('Error fetching test questions:', error);
                 Alert.alert('Failed to fetch test questions.');
@@ -81,51 +97,37 @@ const GroupStudentsListScreen = ({ route }) => {
         const teacherRef = doc(db, 'users', userId);
         const userSnapshot = await getDoc(userRef);
         const teacherSnapshot = await getDoc(teacherRef);
-    
         try {
-            if (userSnapshot.exists() && teacherSnapshot.exists()) {
+            let newGroupT = [];
+            let newGroupS = [];
+            if (userSnapshot.exists()) {
                 const teacherData = teacherSnapshot.data();
                 const GroupT = teacherData.groups || [];
                 const userData = userSnapshot.data();
-                const GroupS = userData.group || [];
-                
-                // Find the group in the teacher's groups
-                const groupIndex = GroupT.findIndex(g => g.id === group);
-                if (groupIndex === -1) {
-                    Alert.alert("Group not found", "The specified group does not exist.");
-                    return;
-                }
-                
-                // Add the student to the group's students array
-                const updatedGroup = {
-                    ...GroupT[groupIndex],
-                    students: [...GroupT[groupIndex].students, username]
-                };
-    
-                // Update the groups array with the modified group
-                const updatedGroupsT = [...GroupT];
-                updatedGroupsT[groupIndex] = updatedGroup;
-                
-                // Update the student's group data
-                const newGroupS = [...GroupS, { id: userId, group : group }];
-    
-                // Update the Firestore documents
+                const GroupS = userData.teacher || [];
+                console.log(userData)
+                newGroupT = [...GroupT, { id: username }];
+                newGroupS =  [...GroupS, { id: userId }]; // Replace 'test-id' and 'score' with actual values
                 await updateDoc(teacherRef, {
-                    groups: updatedGroupsT,
+                    group: newGroupT,
                 });
                 await updateDoc(userRef, {
-                    groups: newGroupS,
+                    group: newGroupS,
                 });
-    
                 setUserName('');
                 setRefresh(prev => !prev);
             } else {
-                Alert.alert("User not found", "The specified user does not exist.");
+                Alert.alert("Студент не найден", "Попробуйте ввести другой никнейм");
             }
         } catch (error) {
-            console.error("Error updating student data:", error);
-            Alert.alert("Error", "There was an error updating the student data.");
+            Alert.alert("Студент не найден", "Попробуйте ввести другой никнейм");
         }
+    }
+
+    const handleTestPress = (id) => {
+        // You can navigate to the test details screen passing the title or any other identifier
+        console.log(id)
+        navigation.navigate('Тесты', { id });
     };
 
     return (
@@ -136,29 +138,19 @@ const GroupStudentsListScreen = ({ route }) => {
                 style={styles.scrollStyle}
                 alignItems={'center'}
             >
-                {students.length > 0 ? (
-                students.map((student, index) => (
-                    <View style={styles.optionButton} key={index}>
-                        <Text  style={styles.optionStyle}>Имя: {student.name}, </Text>
-                        <Text  style={styles.optionStyle}>Фамилия: {student.surname}, </Text>
+                {user.length > 0 ? (
+                user.map((teacher, index) => (
+                    <View style={styles.optionButton} >
+                        <TouchableOpacity onPress={()=> handleTestPress(teacher.id)} style={styles.touchable}>
+                            <Text  style={styles.optionStyle}>{dictionary[teacher.id].name} </Text>
+                            <Text  style={styles.optionStyle}>{dictionary[teacher.id].surname} </Text>
+                        </TouchableOpacity>
                     </View>
                 ))
             ) : (
                 <Text>No students found.</Text>
             )}
             </ScrollView>
-            <View style={styles.inputStyle}>
-            <TextInput
-                placeholder="Никнейм студента"
-                value={username}
-                onChangeText={setUserName}
-                // secureTextEntry
-                style={styles.input}
-            />
-            <TouchableOpacity onPress={() => addStudent()}  style={styles.register} >
-                <Text style={styles.textLogin} >Добавить студента в группу</Text>
-            </TouchableOpacity>
-            </View>
         </View>
     );
 };
@@ -197,6 +189,11 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         color: 'black',
     },
+    touchable: {
+        flex: 1,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+    },
     optionsContainer: {
         // flex:1,
         // justifyContent: 'center',
@@ -207,7 +204,7 @@ const styles = StyleSheet.create({
     optionButton: {
         minWidth: '95%',
         maxWidth: '95%',
-        maxHeight: 100,
+        maxHeight: 80,
         minHeight: 50,
         marginBottom: 10,
         // borderWidth: 1,
@@ -286,4 +283,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default GroupStudentsListScreen;
+export default StudentTeachersListScreen;

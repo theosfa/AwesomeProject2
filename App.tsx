@@ -31,6 +31,9 @@ import TestScreen from './screens/TestScreen';
 import StudentsMarksListScreen from './screens/StudentsMarksListScreen';
 import LectureListScreen from './screens/LectureListScreen';
 import GroupStudentsListScreen from './screens/GroupStudentsListScreen';
+import StudentTeachersListScreen from './screens/StudentTeachersListScreen';
+import TeacherTestsListScreen from './screens/TeacherTestsListScreen';
+import GroupListScreen from './screens/GroupListScreen';
 import LoadingScreen from './screens/LoadingScreen';
 
 //Navigation
@@ -143,7 +146,9 @@ const App = (): React.JSX.Element => {
               {userPermission === 'student' ? (
                 <>
                   <Stack.Screen name="Home" component={StudentNavigation} options={{ headerShown: false }} />
+                  <Stack.Screen name="Тесты" component={TeacherTestsListScreen} />
                   <Stack.Screen name="Тест" component={TestScreen} />
+                  <Stack.Screen name="Преподаватели" component={StudentTeachersListScreen} />
                   <Stack.Screen name="Лекция" component={LectureListScreen} />
                 </>
               ) : (
@@ -152,6 +157,7 @@ const App = (): React.JSX.Element => {
                   <>
                     <Stack.Screen name="Home" component={TeacherNavigation} options={{ headerShown: false }} />
                     <Stack.Screen name="Студенты" component={GroupStudentsListScreen} />
+                    <Stack.Screen name="Группы" component={GroupListScreen} />
                     <Stack.Screen name="Список оценок" component={StudentsMarksListScreen} />
                     <Stack.Screen name="Лекция" component={LectureListScreen} />
                   </>

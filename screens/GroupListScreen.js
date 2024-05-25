@@ -4,10 +4,9 @@ import { auth, db } from '../firebaseConfig'; // Update this path if necessary
 import { collection, doc, getDoc, updateDoc, query, where, getDocs } from 'firebase/firestore';
 import { TouchableOpacity } from 'react-native-gesture-handler'; // Import TouchableOpacity for buttons
 
-const GroupStudentsListScreen = ({ route }) => {
-    const { group } = route.params;
-    const [students, setStudents] = useState([]);
-    const [username, setUserName] = useState('');
+const GroupListScreen = ({ navigation }) => {
+    const [teacherGroups, setTeacherGroups] = useState([]);
+    const [name, setName] = useState('');
     const [loading, setLoading] = useState(true);
     const [refresh, setRefresh] = useState(false);
 
@@ -21,42 +20,45 @@ const GroupStudentsListScreen = ({ route }) => {
                 
                 if (teacher) {
                     // Extract marks (student IDs and scores)
-                    const marks = teacher.groups.find(mark => mark.id === group).students;
-                    console.log(group)
-                    console.log(marks)
-                    
-                    if (marks.length > 0) {
-                        const studentIds = [...new Set(marks)];
-                        console.log(studentIds)
-                        const studentsCollectionRef = collection(db, 'students');
-                        const q = query(studentsCollectionRef, where('__name__', 'in', studentIds));
-                        const querySnapshot = await getDocs(q);
-                        
-                        const studentsData = querySnapshot.docs.map(doc => ({
-                            id: doc.id,
-                            ...doc.data(),
-                        }));
-
-                        const testsCollectionRef = collection(db, 'students');
-                        const snapshot = await getDocs(testsCollectionRef);
-                        const dict = snapshot.docs.reduce((acc, doc) => {
-                            acc[doc.id] = doc.data().id;
-                            return acc;
-                        }, {});
-                        
-                        const studentsWithScores = marks.map(mark => {
-                            const studentData = studentsData.find(student => student.id === dict[mark]);
-                            console.log(mark)
-                            return {
-                                ...studentData,
-                                score: mark.score
-                            };
-                        });
-                        
-                        setStudents(studentsWithScores.reverse());
-                    } else {
-                        setStudents([]);
+                    const groups = teacher.groups;
+                    console.log(groups);
+                    // const studentIds = [...new Set(marks.map(mark => mark.id))];
+                    if (groups){
+                        console.log(groups);
+                        const teacherGroups = groups.map(group => group.id);
+                        setTeacherGroups(teacherGroups);
                     }
+                    // if (studentIds.length > 0) {
+                    //     const studentsCollectionRef = collection(db, 'students');
+                    //     const q = query(studentsCollectionRef, where('__name__', 'in', studentIds));
+                    //     const querySnapshot = await getDocs(q);
+                        
+                    //     const studentsData = querySnapshot.docs.map(doc => ({
+                    //         id: doc.id,
+                    //         ...doc.data(),
+                    //     }));
+
+                    //     const testsCollectionRef = collection(db, 'students');
+                    //     const snapshot = await getDocs(testsCollectionRef);
+                    //     const dict = snapshot.docs.reduce((acc, doc) => {
+                    //         acc[doc.id] = doc.data().id;
+                    //         return acc;
+                    //     }, {});
+                    //     console.log(dict)
+                        
+                    //     const studentsWithScores = marks.map(mark => {
+                    //         const studentData = studentsData.find(student => student.id === dict[mark.id]);
+                    //         // console.log(studentData)
+                    //         return {
+                    //             ...studentData,
+                    //             score: mark.score
+                    //         };
+                    //     });
+                        
+                    //     setStudents(studentsWithScores.reverse());
+                    // } else {
+                    //     setStudents([]);
+                    // }
                 } else {
                     Alert.alert('Test not found');
                 }
@@ -75,58 +77,38 @@ const GroupStudentsListScreen = ({ route }) => {
         return <ActivityIndicator size="large" color="#0000ff" />;
     }
 
-    const addStudent = async () => {
+    const addGroup = async () => {
         const userId = auth.currentUser.uid;
-        const userRef = doc(db, 'students', username);
+        // const userRef = doc(db, 'students', username);
         const teacherRef = doc(db, 'users', userId);
-        const userSnapshot = await getDoc(userRef);
+        // const userSnapshot = await getDoc(userRef);
         const teacherSnapshot = await getDoc(teacherRef);
-    
         try {
-            if (userSnapshot.exists() && teacherSnapshot.exists()) {
+            let newGroupT = [];
+            if (teacherSnapshot.exists()) {
+                console.log('hi');
                 const teacherData = teacherSnapshot.data();
                 const GroupT = teacherData.groups || [];
-                const userData = userSnapshot.data();
-                const GroupS = userData.group || [];
-                
-                // Find the group in the teacher's groups
-                const groupIndex = GroupT.findIndex(g => g.id === group);
-                if (groupIndex === -1) {
-                    Alert.alert("Group not found", "The specified group does not exist.");
-                    return;
-                }
-                
-                // Add the student to the group's students array
-                const updatedGroup = {
-                    ...GroupT[groupIndex],
-                    students: [...GroupT[groupIndex].students, username]
-                };
-    
-                // Update the groups array with the modified group
-                const updatedGroupsT = [...GroupT];
-                updatedGroupsT[groupIndex] = updatedGroup;
-                
-                // Update the student's group data
-                const newGroupS = [...GroupS, { id: userId, group : group }];
-    
-                // Update the Firestore documents
+                newGroupT = [...GroupT, { id: name, students: [] }];// Replace 'test-id' and 'score' with actual values
                 await updateDoc(teacherRef, {
-                    groups: updatedGroupsT,
+                    groups: newGroupT,
                 });
-                await updateDoc(userRef, {
-                    groups: newGroupS,
-                });
-    
-                setUserName('');
+                setName('');
                 setRefresh(prev => !prev);
             } else {
-                Alert.alert("User not found", "The specified user does not exist.");
+                console.log('hi2');
+                Alert.alert("Студент не найден", "Попробуйте ввести другой никнейм");
             }
         } catch (error) {
-            console.error("Error updating student data:", error);
-            Alert.alert("Error", "There was an error updating the student data.");
+            console.log(error);
+            Alert.alert("Студент не найден");
         }
-    };
+    }
+    
+
+    const goToGroup = (group) => {
+        navigation.navigate('Студенты', {group});
+    }
 
     return (
         <View style={styles.container}>
@@ -136,27 +118,28 @@ const GroupStudentsListScreen = ({ route }) => {
                 style={styles.scrollStyle}
                 alignItems={'center'}
             >
-                {students.length > 0 ? (
-                students.map((student, index) => (
-                    <View style={styles.optionButton} key={index}>
-                        <Text  style={styles.optionStyle}>Имя: {student.name}, </Text>
-                        <Text  style={styles.optionStyle}>Фамилия: {student.surname}, </Text>
-                    </View>
-                ))
-            ) : (
-                <Text>No students found.</Text>
-            )}
+                {teacherGroups.length > 0 ? (
+                    teacherGroups.map((group, index) => (
+                        <View style={styles.optionButton} key={index}>
+                            <TouchableOpacity onPress={() => goToGroup(group)} >
+                                <Text style={styles.optionStyle} > Группа: {group}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    ))
+                ) : (
+                    <Text>No group found.</Text>
+                )}
             </ScrollView>
             <View style={styles.inputStyle}>
             <TextInput
-                placeholder="Никнейм студента"
-                value={username}
-                onChangeText={setUserName}
+                placeholder="Название группы"
+                value={name}
+                onChangeText={setName}
                 // secureTextEntry
                 style={styles.input}
             />
-            <TouchableOpacity onPress={() => addStudent()}  style={styles.register} >
-                <Text style={styles.textLogin} >Добавить студента в группу</Text>
+            <TouchableOpacity onPress={() => addGroup()}  style={styles.register} >
+                <Text style={styles.textLogin} >Добавить группу</Text>
             </TouchableOpacity>
             </View>
         </View>
@@ -286,4 +269,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default GroupStudentsListScreen;
+export default GroupListScreen;

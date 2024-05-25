@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import TeachersListScreen from '../screens/TeachersListScreen';
-import ProfileScreen from '../screens/ProfileScreen';
+import AdminProfileScreen from '../screens/AdminProfileScreen';
 import CreateTeacherScreen from '../screens/CreateTeacherScreen';
 
 import {StyleSheet, Image, Text} from 'react-native';
@@ -49,7 +49,7 @@ const  MainAppTabs = () => {
     >
       <Tab.Screen 
           name="Главная" 
-          component={ProfileScreen}
+          component={AdminProfileScreen}
           options={{
             headerTitle: () => (
               <Text style={styles.headerTitle}>Главная</Text>
