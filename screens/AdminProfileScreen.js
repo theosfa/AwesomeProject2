@@ -43,7 +43,9 @@ const AdminProfileScreen = ({ navigation }) => {
                     console.error("Error fetching user details:", error);
                 }
             }
-            setLoading(false);
+            setTimeout(() => {
+              setLoading(false);
+            }, 3000);
         };
 
         if (isFocused) {
@@ -91,7 +93,7 @@ const AdminProfileScreen = ({ navigation }) => {
                     
                   </View>
                 </View>
-                {dictionary
+                {teacher
                   ?
                   <>
                   <Text style={styles.name}>Список Преподавателей</Text>
@@ -102,7 +104,7 @@ const AdminProfileScreen = ({ navigation }) => {
                     showsHorizontalScrollIndicator={false}
                     style={styles.scrollStyle}
                     >
-                      {dictionary.map((item, index) => {
+                      {teacher.map((item, index) => {
                         return <View style={styles.activity} key={index}>
                             <Text style={styles.teacherInfoBold}> {item.name}</Text>
                             <Text style={styles.teacherInfoBold}> {item.surname} </Text>
@@ -150,6 +152,7 @@ const AdminProfileScreen = ({ navigation }) => {
     teacherInfoBold: {
       fontFamily: 'Poppins-Bold',
       fontSize: 15,
+      color: 'black'
     },
     mainInfo: {
       flex: 1,
