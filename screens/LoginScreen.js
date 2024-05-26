@@ -28,6 +28,7 @@ const SignInScreen = () => {
             <ScrollView 
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
+                style={styles.scroll}
             >
             <View style={styles.container}>
             <Text style={styles.secondText}> Добро пожаловать</Text>
@@ -73,6 +74,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingTop: 20,
         backgroundColor: "#fff",
+    },
+    scroll:{
+        marginBottom: '10%',
     },
     image:{
         marginTop: 50,

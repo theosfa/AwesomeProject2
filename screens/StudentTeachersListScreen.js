@@ -137,13 +137,14 @@ const StudentTeachersListScreen = ({ navigation }) => {
                 showsHorizontalScrollIndicator={false}
                 style={styles.scrollStyle}
                 alignItems={'center'}
+                justifyContent={'center'}
             >
                 {user.length > 0 ? (
                 user.map((teacher, index) => (
                     <View style={styles.optionButton} >
-                        <TouchableOpacity onPress={()=> handleTestPress(teacher.id)} style={styles.touchable}>
-                            <Text  style={styles.optionStyle}>{dictionary[teacher.id].name} </Text>
-                            <Text  style={styles.optionStyle}>{dictionary[teacher.id].surname} </Text>
+                        <TouchableOpacity onPress={()=> handleTestPress(teacher.id)} style={styles.button}>
+                            <Text  style={styles.button_text}>{dictionary[teacher.id].surname} {dictionary[teacher.id].name} </Text>
+                            {/* <Text  style={styles.button_text}> </Text> */}
                         </TouchableOpacity>
                     </View>
                 ))
@@ -158,129 +159,45 @@ const StudentTeachersListScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: 20,
-        justifyContent: 'flex-start',
+        justifyContent: 'center',
         alignItems: 'center',
-        flexDirection: 'column',
-        flexWrap: "nowrap",
-        backgroundColor: '#fff',
+        // padding: 20,
+        backgroundColor: '#fff'
     },
-    scrollStyle:{
-        // backgroundColor: 'purple',
-        minWidth: '100%',
-        maxWidth: '100%',
-    },
-    inputStyle:{
-        // backgroundColor:"green",
-        minWidth: '100%',
-        msxWidth: '100%',
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        color: 'black',
-    },
-    questionContainer: {
-        marginBottom: 20
-    },
-    question: {
-        fontSize: 18,
-        marginBottom: 10,
-        color: 'black',
-    },
-    touchable: {
+    scroll: {
         flex: 1,
-        flexDirection: 'row',
-        flexWrap: 'wrap',
+        padding: '5%'
     },
-    optionsContainer: {
-        // flex:1,
-        // justifyContent: 'center',
-        // alignItems: 'flex-start',
-        marginLeft: 20,
-        backgroundColor: 'black',
-    },
-    optionButton: {
+    button: {
+        fontSize: 18,
+        // width: '85%',
         minWidth: '95%',
         maxWidth: '95%',
-        maxHeight: 80,
-        minHeight: 50,
-        marginBottom: 10,
+        minHeight: 80,
+        marginBottom: "6%",
         // borderWidth: 1,
         padding: 10,
+        marginLeft:"2.5%",
+        marginRight:"2.5%",
         borderRadius: 20,
         backgroundColor: '#F0F0F0',
         flex: 1,
-        flexDirection: 'row',
-        flexWrap: 'wrap',
         alignItems: 'center',
         justifyContent: 'center',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
-    optionStyle:{
-        color: 'black',
-        fontSize: 20,
-    },
-    restartContainer:{
-        flex:1,
-        alignItems:'center',
-        justifyContent:'center',
-    },
-    showScore:{
-        fontSize:40,
-        fontFamily:'Poppins-Bold',
-        color: 'black',
-    },
-    showScore2:{
-        fontSize:24,
-        fontFamily:'Poppins-Bold',
-        color: 'white',
-        // backgroundColor:'red',
+    profileImage: {
         alignSelf: 'center',
     },
-    restart:{
-        backgroundColor: "#000",
-        // height: 50,
-        maxHeight: 60,
-        minHeight: 50,
-        width: '85%',
-        flex: 1,
-        marginTop: 25,
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 10,
-        paddingBottom: 12,
-      },
-      input: {
-        minwidth: '100%',
-        height: 45,
-        // marginVertical: 10,
-        // borderWidth: 1,
-        borderRadius: 20,
-        backgroundColor: "#F0F0F0",
-        paddingLeft: 25,
-        padding: 10,
-    },
-      textLogin:{
-        color:'#fff',
-        fontSize: 20,
-        fontFamily: 'Poppins-Bold'
-    },
-    text :{
-        marginLeft:'5%',
-        marginBottom:'5%',
-    },
-    register: {
-        backgroundColor: "#000",
-        // height: 50,
-        maxHeight: 50,
-        minHeight: 50,
-        minwidth: '100%',
-        flex: 1,
-        marginTop: '5%',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
+    button_text:{
+        fontFamily: 'Poppins-Bold',
+        fontSize: 23,
+        color: 'black',
+    }
 });
 
 export default StudentTeachersListScreen;

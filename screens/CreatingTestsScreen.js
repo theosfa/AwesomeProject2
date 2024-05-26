@@ -152,7 +152,7 @@ const LearningAddingScreen = ({ navigation }) => {
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
                 style={styles.scroll}
-                justifyContent={'center'}
+                // justifyContent={'center'}
                 padding={0}
                 margin={0}
             >
@@ -198,12 +198,13 @@ const LearningAddingScreen = ({ navigation }) => {
                         showsHorizontalScrollIndicator={false}
                         style={styles.scrollStyle}
                         alignItems={'center'}
+                        justifyContent={'center'}
                     >
                         {teacherGroups.length > 0 ? (
                             teacherGroups.map((group, index) => (
-                                <View style={styles.optionButton} key={index}>
+                                <View style={styles.button} key={index}>
                                     <TouchableOpacity onPress={() => chooseGroup(group)} >
-                                        <Text style={styles.optionStyle} > Группа: {group}</Text>
+                                        <Text style={styles.button_text} > Группа: {group}</Text>
                                     </TouchableOpacity>
                                 </View>
                             ))
@@ -303,6 +304,7 @@ const styles = StyleSheet.create({
         minwidth: '100%',
         flex: 1,
         marginTop: 25,
+        marginBottom: 25,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -362,6 +364,40 @@ const styles = StyleSheet.create({
         marginTop: '5%',
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    // scroll: {
+    //     flex: 1,
+    //     padding: '5%'
+    // },
+    button: {
+        fontSize: 18,
+        // width: '85%',
+        minWidth: '95%',
+        maxWidth: '95%',
+        minHeight: 80,
+        marginBottom: "6%",
+        // borderWidth: 1,
+        padding: 10,
+        marginLeft:"2.5%",
+        marginRight:"2.5%",
+        borderRadius: 20,
+        backgroundColor: '#F0F0F0',
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    profileImage: {
+        alignSelf: 'center',
+    },
+    button_text:{
+        fontFamily: 'Poppins-Regular',
+        fontSize: 27,
+        color: 'black',
     },
 });
 

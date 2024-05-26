@@ -55,8 +55,10 @@ const SignupScreen = ({ navigation }) => {
             <ScrollView 
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
+                // alignItems={'center'}
+                style={styles.scroll}
             >
-            <View style={styles.container}>
+                <View style={styles.container}>
             <Image source={require('../assets/images/preview.png')} style={styles.image} />
 
             <TextInput
@@ -104,7 +106,8 @@ const SignupScreen = ({ navigation }) => {
             <TouchableOpacity onPress={() => navigation.navigate('Login')}  >
                 <Text style={styles.textLogin} >Войти</Text>
             </TouchableOpacity>
-            </View></View>
+            </View>
+            </View>
             </ScrollView>
         </View>
     );
@@ -118,6 +121,9 @@ const styles = StyleSheet.create({
         // padding: 20,
         backgroundColor: "#fff",
     },
+    scroll:{
+        marginVertical: '10%',
+    },
     image:{
         marginTop: 50,
         height: 250,
@@ -125,7 +131,8 @@ const styles = StyleSheet.create({
         marginBottom: 30,
     },
     input: {
-        width: '85%',
+        minWidth: '85%',
+        maxWidth: '85%',
         height: 45,
         marginVertical: 10,
         // borderWidth: 1,

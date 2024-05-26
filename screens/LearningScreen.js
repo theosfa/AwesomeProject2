@@ -38,11 +38,13 @@ const LearningScreen = ({ navigation }) => {
                 
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
+                alignItems={'center'}
+                style={styles.scroll}
             >
-            <Image
+            {/* <Image
                 source={require('../assets/images/tests.png')} // Replace with your actual profile image source
                 style={styles.profileImage}
-            />
+            /> */}
             {lectureTitles.map((lecture, index) => (
                 <TouchableOpacity key={index} onPress={() => handleTestPress(lectureIds[index])}  style={styles.button}>
                     <Text style={styles.button_text}>{lecture}</Text>
@@ -58,8 +60,15 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
+        // padding: 20,
         backgroundColor: '#fff'
+    },
+    scroll: {
+        flex: 1,
+        paddingTop: '2.5%',
+        // paddingBottom: "20%",
+        margin: "2.5%",
+        marginTop: 0,
     },
     button: {
         fontSize: 18,
@@ -67,14 +76,21 @@ const styles = StyleSheet.create({
         minWidth: '95%',
         maxWidth: '95%',
         minHeight: 80,
-        marginBottom: 10,
+        marginBottom: "6%",
         // borderWidth: 1,
         padding: 10,
+        marginLeft:"2.5%",
+        marginRight:"2.5%",
         borderRadius: 20,
         backgroundColor: '#F0F0F0',
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
     profileImage: {
         alignSelf: 'center',

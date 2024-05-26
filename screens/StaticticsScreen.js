@@ -88,30 +88,38 @@ const ProfileScreen = ({ navigation }) => {
             {userProfile ? (
               <View style={styles.container}>
                 <View style={styles.mainInfo}>
-                  <View style={styles.profileContainer}>
-                    <Image
-                      source={require('../assets/images/preview.png')} // Replace with your actual profile image source
-                      style={styles.profileImage}
-                      />
-                  </View>
-                  <View style={styles.infoContainer}>
-                    <TouchableOpacity  onPress={handleLogout} style={styles.button_logout}>
-                        <Text style={styles.headerRight}>Выйти</Text>
-                    </TouchableOpacity>
-                    <View>
-                      <Text style={styles.name}>{userProfile.name} {userProfile.surname}</Text>
+                  <View style={styles.mainInfo2}>
+
+                    <View style={styles.profileContainer}>
+                      <Image
+                        source={require('../assets/images/preview.png')} // Replace with your actual profile image source
+                        style={styles.profileImage}
+                        />
                     </View>
+
+                    <View style={styles.infoContainer}>
+
+                      <TouchableOpacity  onPress={handleLogout} style={styles.button_logout}>
+                          <Text style={styles.headerRight}>Выйти</Text>
+                      </TouchableOpacity>
+
+                      <View style={styles.infoContainer2}>
+                        <Text style={styles.name2}>{userProfile.name} {userProfile.surname}</Text>
+                      </View>
+
+                    </View>
+
+                  </View>
+                  <View style={styles.activitys}>
+                    <TouchableOpacity onPress={() => addStudents()} style={styles.activity2}>
+                      <Text style={styles.activity_text2}>Добавить людей в группу</Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
-                <View>
-                  <TouchableOpacity onPress={() => addStudents()} style={styles.activity2}>
-                    <Text style={styles.activity_text}>Добавить людей в группу</Text>
-                  </TouchableOpacity>
-                  </View>
                 {userTests
                   ?
                   <>
-                  <Text style={styles.name}>Последняя активность</Text>
+                  <Text style={styles.name}>Просмотр статистики</Text>
                   <View style={styles.scroll2}>
                     
                   <ScrollView 
@@ -135,8 +143,8 @@ const ProfileScreen = ({ navigation }) => {
                   </>
                   :
                   <View style={styles.scroll}>
-                    <Text style={styles.name}>Последняя активность</Text>
-                    <Text>Последняя активность отсутствует</Text>
+                    <Text style={styles.name}>Просмотр статистики</Text>
+                    <Text>Cтатистикf отсутствует</Text>
                   </View>
                 }
               </View>
@@ -159,15 +167,66 @@ const ProfileScreen = ({ navigation }) => {
       // flexWrap:'nowrap',
       justifyContent: 'flex-start',
       alignItems: 'center',
-      backgroundColor: '#fff',
+      // backgroundColor: 'yellow',
+      padding: 0,
+      margin: 0,
       // backgroundColor: '#ccf3ff',
       
     },
     mainInfo: {
       flex: 1,
-      flexDirection: 'row',
+      flexDirection: 'column',
       flexGrow:1,
-      // backgroundColor:'purple'
+      minWidth:"100%",
+      // backgroundColor:'green'
+    },
+    mainInfo2: {
+      flex: 1,
+      flexDirection: 'row',
+      // backgroundColor:'purple',
+      flexGrow:2,
+      // backgroundColor:'red'
+    },
+    infoContainer: {
+      flex: 1,
+      flexDirection: 'column',
+      justifyContent: 'flex-start',
+      alignItems: 'flex-start',
+      paddingLeft: "2.5%",
+      // marginRight: "2.5%",
+      paddingTop: '2.5%',
+      // paddingTop: 30,
+      flexGrow:2,
+      // backgroundColor: 'orange',
+    },
+    infoContainer2: {
+      flex: 1,
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'flex-start',
+      paddingLeft: "2.5%",
+      // marginRight: "2.5%",
+      paddingTop: '2.5%',
+      // paddingTop: 30,
+      flexGrow:2,
+      // backgroundColor: 'purple',
+    },
+    profileContainer: {
+      flex: 1,
+      justifyContent: 'flex-start',
+      alignItems: 'center',
+      paddingTop: 30,
+      paddingLeft: 30,
+      height: 100,
+      // backgroundColor: "orange",
+    },
+    activitys: {
+      flex: 1,
+      // flexDirection: 'row',
+      // 
+      flexGrow:1,
+      justifyContent:"center",
+      alignItems:'center',
     },
     scroll:{
       flex:1,
@@ -183,42 +242,66 @@ const ProfileScreen = ({ navigation }) => {
       maxWidth: '90%',
       minWidth: '90%',
       width: '90%',
-      flexGrow:1,
+      flexGrow:2,
       // width: 'auto',
     },
     scrollStyle:{
       // backgroundColor: 'orange',
-      height: '85%',
+      // height: '85%',
+      // backgroundColor:'orange',
+      flexGrow:3,
     },
     activity:{
       flex:1,
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
+      // width: '85%',
       minWidth: '95%',
       maxWidth: '95%',
       minHeight: 80,
-      borderRadius: 20,
-      marginBottom: 10,
+      // marginTop: "2.5%",
+      marginBottom: "6%",
+      // borderWidth: 1,
       padding: 10,
-      backgroundColor: '#F0F0F0',
+      marginLeft:"2.5%",
+      marginRight:"2.5%",
+      borderRadius: 20,
+      // backgroundColor: '#F0F0F0',
+      flex: 1,
+      alignItems: 'center',
+      // backgroundColor:'lightgray',
+      backgroundColor:'#e6e6e6',
+      justifyContent: 'center',
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
       
     },  
     activity2:{
-      flex:1,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
+      flex: 1,
       alignItems: 'center',
-      alignSelf: 'flex-start',
-      minWidth: '85%',
-      maxWidth: '85%',
+      justifyContent: 'center',
+      // alignSelf: 'center',
+      // width: '85%',
+      minWidth: '90%',
+      maxWidth: '90%',
       minHeight: 50,
-      maxHeight: 80,
-      borderRadius: 20,
-      marginBottom: 10,
-      marginTop: 30,
+      // marginTop: "2.5%",
+      marginBottom: "6%",
+      // borderWidth: 1,
       padding: 10,
-      backgroundColor: '#F0F0F0',
+      marginLeft:"2.5%",
+      marginRight:"2.5%",
+      borderRadius: 10,
+      backgroundColor: 'black',
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
       
     },  
     profileImage: {
@@ -237,6 +320,14 @@ const ProfileScreen = ({ navigation }) => {
       // backgroundColor:'gray',
       maxWidth: '85%',
       minWidth: '85%',
+      color: "black"
+    },
+    activity_text2:{
+      // flexGrow:2, 
+      fontSize: 18,
+      fontFamily: 'Poppins-Bold',
+      // backgroundColor:'gray',
+      color: "white"
     },
     activity_grade:{
       flex:1,
@@ -251,30 +342,26 @@ const ProfileScreen = ({ navigation }) => {
     activity_grade_text:{
       fontFamily: 'Poppins-Bold',
     },
-    profileContainer: {
-      flex: 1,
-      justifyContent: 'flex-start',
-      alignItems: 'center',
-      paddingTop: 30,
-      paddingLeft: 30,
-      height: 100,
-    },
+    
     profileImage: {
       width: 100,
       height: 100,
     },
-    infoContainer: {
-      flex: 1,
-      justifyContent: 'flex-start',
-      alignItems: 'flex-start',
-      padding: 20,
-      paddingTop: 30,
-      flexGrow:2,
-    },
+    
     name: {
+      fontSize: 22,
+      fontWeight: 'bold',
+      // marginTop: "5%",
+      marginBottom: "5%",
+      color: 'black',
+
+      // backgroundColor: 'green',
+    },
+    name2: {
       fontSize: 20,
       fontWeight: 'bold',
-      marginBottom: 5,
+      // marginTop: "5%",
+      marginBottom: "5%",
       color: 'black',
 
       // backgroundColor: 'green',
@@ -292,9 +379,10 @@ const ProfileScreen = ({ navigation }) => {
     },
     button_logout: {
       backgroundColor: 'black',
-      borderRadius: 100,
+      borderRadius: 10,
       paddingLeft: 10,
       paddingRight: 10,
+      marginRight: '4%',
       alignSelf: 'flex-end',
     },
     headerRight: {

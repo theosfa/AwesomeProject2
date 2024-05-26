@@ -393,8 +393,9 @@ const LectureListScreen = ({ route, navigation }) => {
                             <View style={styles.selectedTextStyle}>
                                 <Text>{item.text}</Text>
                                 {isPracticum === 'with' && (
-                                    <>
-                                        <Text>{item.practicumQuestion}</Text>
+                                    <>  
+                                        <Text style={styles.title2}>Задача для проверки заний</Text>
+                                        <Text style={styles.question}>{item.practicumQuestion}</Text>
                                         <TextInput
                                             placeholder="Ответ к задаче"
                                             value={answers[index]}
@@ -410,7 +411,7 @@ const LectureListScreen = ({ route, navigation }) => {
             </ScrollView>
             {isPracticum === 'with' && (
                 <TouchableOpacity onPress={handleSubmitAnswers} style={styles.submitButton}>
-                    <Text style={styles.submitButtonText}>Submit Answers</Text>
+                    <Text style={styles.submitButtonText}>Завершить практикум</Text>
                 </TouchableOpacity>
             )}
         </View>
@@ -428,7 +429,20 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 20,
+        marginBottom: '8%',
+        color: 'black',
+    },
+    title2: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        marginBottom: '4%',
+        marginTop: '8%',
+        color: 'black',
+    },
+    question: {
+        fontSize: 15,
+        fontWeight: 'regular',
+        marginBottom: '4%',
         color: 'black',
     },
     input: {
@@ -441,16 +455,37 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     optionButton: {
-        minWidth: '100%',
-        maxWidth: '100%',
+        // minWidth: '98%',
+        // maxWidth: '98%',
         maxHeight: 80,
         minHeight: 50,
+        // padding: 10,
+        // borderRadius: 20,
+        // backgroundColor: '#F0F0F0',
+        // flex: 1,
+        // margin: '1%',
+        // alignItems: 'center',
+        // justifyContent: 'center',
+        fontSize: 18,
+        // width: '85%',
+        minWidth: '95%',
+        maxWidth: '95%',
+        // minHeight: 80,
+        marginBottom: "5%",
+        // borderWidth: 1,
         padding: 10,
+        marginLeft:"2.5%",
+        marginRight:"2.5%",
         borderRadius: 20,
         backgroundColor: '#F0F0F0',
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
     optionStyle: {
         color: 'black',

@@ -68,12 +68,7 @@ const CreatingLecturesScreen = ({ navigation }) => {
             const userDocRef = doc(db, "teacherTests", userId);
             try {
                 const userDoc = await getDoc(userDocRef);
-                let docRef;
-                if (privacy === 'with'){
-                    docRef = await addDoc(testsCollectionRef, { materials: test, title: title, privacy: privacy, });
-                } else {
-                    docRef = await addDoc(testsCollectionRef, { materials: test, title: title, privacy: privacy });
-                }
+                const docRef = await addDoc(testsCollectionRef, { materials: test, title: title, privacy: privacy });
                 let newTests = [];
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
@@ -88,9 +83,9 @@ const CreatingLecturesScreen = ({ navigation }) => {
                     });  // Replace 'test-id' and 'score' with actual values
                 } else {
                     if (privacy === 'with'){
-                        newTests = [...tests, { id: docRef.id, type: 'practicum' }];
+                        newTests = [ {id: docRef.id, type: 'practicum'} ];
                     } else {
-                        newTests = [...tests, { id: docRef.id, type: 'lectures' }];
+                        newTests = [ {id: docRef.id, type: 'lectures'} ];
                     }
                     await setDoc(userDocRef, {
                         tests: newTests,
@@ -106,6 +101,8 @@ const CreatingLecturesScreen = ({ navigation }) => {
             setTitle('')
             setIsTest(false);
             setIsPracticum(false);
+            setIsLecture(false);
+            setPrivacy('');
             navigation.navigate('Статистика');
         }
     };
@@ -125,6 +122,9 @@ const CreatingLecturesScreen = ({ navigation }) => {
         setAnswers([{ text: '' }]); // Reset answers
         setCorrectAnswer('');
         setPracticumQuestion('');
+        setInputHeight1(45)
+        setInputHeight2(45)
+        setInputHeight3(45)
         setText('');
     }
     
