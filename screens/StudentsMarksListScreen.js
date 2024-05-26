@@ -5,7 +5,7 @@ import { collection, doc, getDoc, updateDoc, query, where, getDocs } from 'fireb
 import { TouchableOpacity } from 'react-native-gesture-handler'; // Import TouchableOpacity for buttons
 
 const StudentsMarksListScreen = ({ route, navigation }) => {
-    const { id } = route.params;
+    const { id, type } = route.params;
     const [students, setStudents] = useState([]);
     const [title, setTitle] = useState('');
     const [loading, setLoading] = useState(true);
@@ -13,8 +13,12 @@ const StudentsMarksListScreen = ({ route, navigation }) => {
     useEffect(() => {
         const fetchTestQuestions = async () => {
             try {
-                // Fetch the test document
-                const testRef = doc(db, 'tests', id);
+                let testRef;
+                if (type === 'practicum'){
+                    testRef = doc(db, "lectures", id)
+                } else {
+                    testRef = doc(db, type, id);
+                }
                 const testSnapshot = await getDoc(testRef);
                 const test = testSnapshot.data();
                 
@@ -76,7 +80,12 @@ const StudentsMarksListScreen = ({ route, navigation }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Название теста: {title}</Text>
+            {type === "tests" ? (<>
+                <Text style={styles.title}>Название теста: {title}</Text>
+            </>) : (<>
+                <Text style={styles.title}>Название практикума: {title}</Text>
+            </>)}
+            
             {students.length > 0 ? (
                 students.map((student, index) => (
                     <View style={styles.optionButton} key={index}>

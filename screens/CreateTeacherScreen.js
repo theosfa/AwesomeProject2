@@ -25,7 +25,7 @@ const CreateTeacherScreen = ({ navigation }) => {
                 permission: 'teacher',
             });
 
-            await signOut(auth);
+            // await signOut(auth);
             signInWithEmailAndPassword(auth, 'admin@admin.com', '12345678')
             .then((userCredential) => {
                 navigation.navigate('Home'); // Assuming 'Home' is a route in your navigator

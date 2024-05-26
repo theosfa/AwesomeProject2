@@ -71,10 +71,10 @@ const TestScreen = ({ route, navigation }) => {
                     const marks = testData.marks || [];
                     const userData = userDoc.data();
                     const tests = userData.tests || [];
-                    newTests = [...tests, { id: id, score: Number(percentage.toFixed()) }];
+                    newTests = [...tests, { id: id, score: Number(percentage.toFixed()), type: 'tests' }];
                     newMarks =  [...marks, { id: userDoc.data().username, score: Number(percentage.toFixed()) }]; // Replace 'test-id' and 'score' with actual values
                 } else {
-                    newTests = [{ id: id, score: Number(percentage.toFixed()) }];
+                    newTests = [{ id: id, score: Number(percentage.toFixed()), type: 'tests' }];
                     newMarks =  [{ id: userDoc.data().username, score: Number(percentage.toFixed()) }]  // Replace 'test-id' and 'score' with actual values
                 }
                 await updateDoc(userDocRef, {

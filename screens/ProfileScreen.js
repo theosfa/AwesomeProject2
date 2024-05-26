@@ -10,7 +10,8 @@ import {Hr} from 'react-native-hr';
 const ProfileScreen = ({ navigation }) => {
     const [userProfile, setUserProfile] = useState(null);
     const [userTests, setUserTests] = useState(null);
-    const [dictionary, setDictionary] = useState(null);
+    const [dictionaryT, setDictionaryT] = useState(null);
+    const [dictionaryL, setDictionaryL] = useState(null);
     const [loading, setLoading] = useState(true);
     const isFocused = useIsFocused();
 
@@ -24,7 +25,15 @@ const ProfileScreen = ({ navigation }) => {
                     acc[doc.id] = doc.data().title;
                     return acc;
                   }, {});
-                setDictionary(dict);
+                setDictionaryT(dict);
+                const testsCollectionRefL = collection(db, 'lectures');
+                const snapshotL = await getDocs(testsCollectionRefL);
+                const dictL = snapshotL.docs.reduce((acc, doc) => {
+                    acc[doc.id] = doc.data().title;
+                    return acc;
+                  }, {});
+                setDictionaryL(dictL);
+                console.log(dictL);
                 const userId = auth.currentUser.uid; // Get current user's UID
                 const userDocRef = doc(db, "users", userId);
                 try {
@@ -32,6 +41,7 @@ const ProfileScreen = ({ navigation }) => {
                     if (userDoc.exists()) {
                         setUserProfile(userDoc.data());
                         if(userDoc.data().tests){
+                          console.log(userDoc.data().tests.reverse())
                           setUserTests(userDoc.data().tests.reverse());
                         }
                         
@@ -107,7 +117,12 @@ const ProfileScreen = ({ navigation }) => {
                     >
                       {userTests.map((item, index) => {
                         return <View style={styles.activity} key={index}>
-                            <Text style={styles.activity_text}> {dictionary[item.id]}</Text>
+                            {item.type === 'lectures' ? (<>
+                              <Text style={styles.activity_text}> {dictionaryL[item.id]}</Text>
+                            </>) : (<>
+                              <Text style={styles.activity_text}> {dictionaryT[item.id]}</Text>
+                            </>)}
+                            
                             <View style={styles.activity_grade}>
                               <Text style={styles.activity_grade_text}> {item.score} </Text>
                               <Text style={styles.activity_grade_text}> % </Text>

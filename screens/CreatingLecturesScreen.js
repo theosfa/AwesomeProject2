@@ -10,18 +10,22 @@ import { set } from 'firebase/database';
 Создать тест с полем для ввода ответа
 */
 
-const LearningAddingScreen = ({ navigation }) => {
+const CreatingLecturesScreen = ({ navigation }) => {
     const [teacherGroups, setTeacherGroups] = useState([]);
     const [questionTitle, setQuestionTitle] = useState('');
     const [answers, setAnswers] = useState([]);
-    const [ans, setAns] = useState('');
+    const [text, setText] = useState('');
     const [title, setTitle] = useState('');
     const [isTest, setIsTest] = useState(false);
     const [test, setTest] = useState([])
-    const [inputHeight, setInputHeight] = useState(45);
-    const [privacy, setPrivacy] = useState('teacher'); 
-    const [isPrivacy, setIsPrivacy] = useState(false);
+    const [inputHeight1, setInputHeight1] = useState(45);
+    const [inputHeight2, setInputHeight2] = useState(45);
+    const [inputHeight3, setInputHeight3] = useState(45);
+    const [privacy, setPrivacy] = useState(''); 
+    const [isPracticum, setIsPracticum] = useState(false);
+    const [isLecture, setIsLecture] = useState(false);
     const [correctAnswer, setCorrectAnswer] = useState('');
+    const [practicumQuestion, setPracticumQuestion] = useState('');
     const [group, setGroup] = useState('');
     const [isGroup, setIsGroup] = useState(false);
 
@@ -60,33 +64,33 @@ const LearningAddingScreen = ({ navigation }) => {
     const updateTest = async () => {
         if (auth.currentUser) {
             const userId = auth.currentUser.uid;
-            const testsCollectionRef = collection(db, "tests");
+            const testsCollectionRef = collection(db, "lectures");
             const userDocRef = doc(db, "teacherTests", userId);
             try {
                 const userDoc = await getDoc(userDocRef);
                 let docRef;
-                if (privacy === 'teacher'){
-                    docRef = await addDoc(testsCollectionRef, { questions: test, title: title, privacy: privacy, group: group });
+                if (privacy === 'with'){
+                    docRef = await addDoc(testsCollectionRef, { materials: test, title: title, privacy: privacy, });
                 } else {
-                    docRef = await addDoc(testsCollectionRef, { questions: test, title: title, privacy: privacy });
+                    docRef = await addDoc(testsCollectionRef, { materials: test, title: title, privacy: privacy });
                 }
                 let newTests = [];
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
                     const tests = userData.tests || [];
-                    if (privacy === 'teacher'){
-                        newTests = [...tests, { id: docRef.id, group: group, type: 'tests' }];
+                    if (privacy === 'with'){
+                        newTests = [...tests, { id: docRef.id, type: 'practicum' }];
                     } else {
-                        newTests = [...tests, { id: docRef.id, type: 'tests' }];
+                        newTests = [...tests, { id: docRef.id, type: 'lectures' }];
                     }
                     await updateDoc(userDocRef, {
                         tests: newTests,
                     });  // Replace 'test-id' and 'score' with actual values
                 } else {
-                    if (privacy === 'teacher'){
-                        newTests = [{ id: docRef.id, group: group, type: 'tests' }];
+                    if (privacy === 'with'){
+                        newTests = [...tests, { id: docRef.id, type: 'practicum' }];
                     } else {
-                        newTests = [{ id: docRef.id, type: 'tests' }];
+                        newTests = [...tests, { id: docRef.id, type: 'lectures' }];
                     }
                     await setDoc(userDocRef, {
                         tests: newTests,
@@ -101,32 +105,39 @@ const LearningAddingScreen = ({ navigation }) => {
             setTest([])
             setTitle('')
             setIsTest(false);
-            setIsPrivacy(false);
+            setIsPracticum(false);
             navigation.navigate('Статистика');
         }
     };
     
    
 
-    const createTest = () => {
-        setIsTest(true);
-        console.log('Hello')
-    }
-
+    
     const addQuestion = () => {
-        const newQuestion = { question: questionTitle, answer: correctAnswer, options: answers.map(a => a.text) };
+        let newQuestion;
+        if (privacy === "with"){
+            newQuestion = { title : questionTitle, text : text, practicumQuestion: practicumQuestion, correctAnswer: correctAnswer};
+        }else{
+            newQuestion = {title : questionTitle, text : text};
+        }
         setTest(prevTest => [...prevTest, newQuestion]);
         setQuestionTitle('');
         setAnswers([{ text: '' }]); // Reset answers
         setCorrectAnswer('');
+        setPracticumQuestion('');
+        setText('');
     }
-
+    
     const setPrivacyTest = (privacy) => {
         setPrivacy(privacy);
-        setIsPrivacy(true);
-        if( privacy === 'teacher'){
-            setIsGroup(true);
+        if (privacy === "with") {
+            setIsPracticum(true);
         }
+    }
+    
+    const createTest = () => {
+        setIsLecture(true);
+        console.log('Hello')
     }
 
     const addAnswerField = () => {
@@ -147,7 +158,8 @@ const LearningAddingScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-        {isTest ? (<>
+        {isLecture ? (<>
+        {isPracticum ? (<>
             <ScrollView 
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
@@ -156,82 +168,100 @@ const LearningAddingScreen = ({ navigation }) => {
                 padding={0}
                 margin={0}
             >
-        <Text style={styles.text}>{title}</Text>
+            <Text style={styles.text}>{title}</Text>
             <TextInput
-            placeholder="Текст вопроса"
-            value={questionTitle}
-            onChangeText={setQuestionTitle}
-            style={[styles.input, { height: inputHeight }, {borderRadius: 20}]}
-            multiline={true}
-            onContentSizeChange={(event) => setInputHeight(event.nativeEvent.contentSize.height)}
-        />
-        {answers.map((item, index) => (
+                placeholder="Название темы"
+                value={questionTitle}
+                onChangeText={setQuestionTitle}
+                style={[styles.input, { height: inputHeight1 }, {borderRadius: 20}]}
+                multiline={true}
+                onContentSizeChange={(event) => setInputHeight1(event.nativeEvent.contentSize.height)}
+            />
             <TextInput
-                key={index}
-                placeholder={`Ответ ${index + 1}`}
-                value={item.text}
-                onChangeText={(text) => updateAnswer(text, index)}
+                placeholder={`Материал темы`}
+                value={text}
+                onChangeText={setText}
+                style={[styles.input, { height: inputHeight2 }, {borderRadius: 20}]}
+                multiline={true}
+                onContentSizeChange={(event) => setInputHeight2(event.nativeEvent.contentSize.height)}
+            />
+            <TextInput
+                placeholder={`Задача для практикума`}
+                value={practicumQuestion}
+                onChangeText={setPracticumQuestion}
+                style={[styles.input, { height: inputHeight3 }, {borderRadius: 20}]}
+                multiline={true}
+                onContentSizeChange={(event) => setInputHeight3(event.nativeEvent.contentSize.height)}
+            />
+            <TextInput
+                placeholder="Ответ к задаче"
+                value={correctAnswer}
+                onChangeText={setCorrectAnswer}
                 style={styles.input}
             />
-        ))}
-        <TouchableOpacity onPress={addAnswerField} style={styles.register}>
-            <Text style={styles.textLogin}>Добавить вариант ответа</Text>
-        </TouchableOpacity>
-        <TextInput
-                        placeholder="Правильний ответ"
-                        value={correctAnswer}
-                        onChangeText={setCorrectAnswer}
-                        style={styles.input}
-                    />
             <TouchableOpacity onPress={addQuestion} style={styles.register} >
-                <Text style={styles.textLogin} >Добавить вопрос</Text>
+                <Text style={styles.textLogin} >Добавить тему</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={updateTest} style={styles.register} >
-                <Text style={styles.textLogin} >Сформировать тест</Text>
+                <Text style={styles.textLogin} >Сформировать лекцию</Text>
             </TouchableOpacity>
             </ScrollView>
         </>) : (<>
-            {isPrivacy ? (<>
-                {isGroup ? (<>
-                    <ScrollView 
-                        showsVerticalScrollIndicator={false}
-                        showsHorizontalScrollIndicator={false}
-                        style={styles.scrollStyle}
-                        alignItems={'center'}
-                    >
-                        {teacherGroups.length > 0 ? (
-                            teacherGroups.map((group, index) => (
-                                <View style={styles.optionButton} key={index}>
-                                    <TouchableOpacity onPress={() => chooseGroup(group)} >
-                                        <Text style={styles.optionStyle} > Группа: {group}</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            ))
-                        ) : (
-                            <Text>No group found.</Text>
-                        )}
-                    </ScrollView>
-                </>) : (<>
-                    <TextInput
-                        placeholder="Название теста"
-                        value={title}
-                        onChangeText={setTitle}
-                        // secureTextEntry
-                        style={styles.inputMain}
-                    />
-                    <TouchableOpacity onPress={createTest} style={styles.registerMain} >
-                        <Text style={styles.textLogin} >Создать тест</Text>
-                    </TouchableOpacity>
-                </>)}
-            </>) : (<>
-                <TouchableOpacity onPress={() => setPrivacyTest('public')} style={styles.registerMain} >
-                    <Text style={styles.textLogin} >Создать публичный тест</Text>
+            <ScrollView 
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+                style={styles.scroll}
+                justifyContent={'center'}
+                padding={0}
+                margin={0}
+            >
+            <Text style={styles.text}>{title}</Text>
+            <TextInput
+                placeholder="Название темы"
+                value={questionTitle}
+                onChangeText={setQuestionTitle}
+                style={[styles.input, { height: inputHeight1 }, {borderRadius: 20}]}
+                multiline={true}
+                onContentSizeChange={(event) => setInputHeight1(event.nativeEvent.contentSize.height)}
+            />
+            <TextInput
+                placeholder={`Материал темы`}
+                value={text}
+                onChangeText={setText}
+                style={[styles.input, { height: inputHeight2 }, {borderRadius: 20}]}
+                multiline={true}
+                onContentSizeChange={(event) => setInputHeight2(event.nativeEvent.contentSize.height)}
+            />
+            <TouchableOpacity onPress={addQuestion} style={styles.register} >
+                <Text style={styles.textLogin} >Добавить тему</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={updateTest} style={styles.register} >
+                <Text style={styles.textLogin} >Сформировать лекцию</Text>
+            </TouchableOpacity>
+            </ScrollView>
+        
+        </>)}
+        </>) : (<>
+            {privacy ? (<>
+                <TextInput
+                    placeholder="Название лекции"
+                    value={title}
+                    onChangeText={setTitle}
+                    // secureTextEntry
+                    style={styles.inputMain}
+                />
+                <TouchableOpacity onPress={createTest} style={styles.registerMain} >
+                    <Text style={styles.textLogin} >Добавить название</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setPrivacyTest('teacher')} style={styles.registerMain} >
-                    <Text style={styles.textLogin} >Создать приватный тест</Text>
+            </>) : (<>
+                <TouchableOpacity onPress={() => setPrivacyTest('with')} style={styles.registerMain} >
+                    <Text style={styles.textLogin} >Создать практикум</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setPrivacyTest('without')} style={styles.registerMain} >
+                    <Text style={styles.textLogin} >Создать лекцию</Text>
                 </TouchableOpacity>
             </>)}
-            
+               
         </>)}
         
         </View>
@@ -365,4 +395,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default LearningAddingScreen;
+export default CreatingLecturesScreen;

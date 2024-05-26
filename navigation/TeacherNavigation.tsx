@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import CreatingTestsScreen from '../screens/CreatingTestsScreen';
-import LearningScreen from '../screens/LearningScreen.js';
+import CreatingLecturesScreen from '../screens/CreatingLecturesScreen';
 import StaticticsScreen from '../screens/StaticticsScreen';
 
 import {StyleSheet, Image, Text} from 'react-native';
@@ -55,7 +55,7 @@ const  TeacherNavigation = () => {
     >
       <Tab.Screen 
           name="Лекции" 
-          component={LearningScreen}
+          component={CreatingLecturesScreen}
           options={{
             headerTitle: () => (
               <Text style={styles.headerTitle}>Лекции</Text>

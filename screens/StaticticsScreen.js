@@ -10,7 +10,8 @@ import {Hr} from 'react-native-hr';
 const ProfileScreen = ({ navigation }) => {
     const [userProfile, setUserProfile] = useState(null);
     const [userTests, setUserTests] = useState(null);
-    const [dictionary, setDictionary] = useState(null);
+    const [dictionaryT, setDictionaryT] = useState(null);
+    const [dictionaryL, setDictionaryL] = useState(null);
     const [loading, setLoading] = useState(true);
     const isFocused = useIsFocused();
 
@@ -18,13 +19,20 @@ const ProfileScreen = ({ navigation }) => {
     useEffect(() => {
         const fetchUserProfile = async () => {
             if (auth.currentUser) {
-                const testsCollectionRef = collection(db, 'tests');
-                const snapshot = await getDocs(testsCollectionRef);
-                const dict = snapshot.docs.reduce((acc, doc) => {
-                    acc[doc.id] = doc.data().title;
-                    return acc;
-                  }, {});
-                setDictionary(dict);
+              const testsCollectionRef = collection(db, 'tests');
+              const snapshot = await getDocs(testsCollectionRef);
+              const dict = snapshot.docs.reduce((acc, doc) => {
+                  acc[doc.id] = doc.data().title;
+                  return acc;
+                }, {});
+              setDictionaryT(dict);
+              const testsCollectionRefL = collection(db, 'lectures');
+              const snapshotL = await getDocs(testsCollectionRefL);
+              const dictL = snapshotL.docs.reduce((acc, doc) => {
+                  acc[doc.id] = doc.data().title;
+                  return acc;
+                }, {});
+              setDictionaryL(dictL);
                 const userId = auth.currentUser.uid; // Get current user's UID
                 const userDocRef = doc(db, "teacherTests", userId);
                 const teacherDocRef = doc(db, "users", userId);
@@ -53,8 +61,8 @@ const ProfileScreen = ({ navigation }) => {
     }, [isFocused]);
 
 
-    const checkStatistics = (id) => {
-      navigation.navigate('Список оценок', { id });
+    const checkStatistics = (id, type) => {
+      navigation.navigate('Список оценок', { id, type });
     }
 
     const addStudents = () => {
@@ -112,9 +120,14 @@ const ProfileScreen = ({ navigation }) => {
                     style={styles.scrollStyle}
                     >
                       {userTests.map((item, index) => {
-                        return <TouchableOpacity onPress={() => checkStatistics(item.id)} style={styles.activity} key={index}>
-                            <Text style={styles.activity_text}> {dictionary[item.id]}</Text>
-                        </TouchableOpacity>
+                        return item.type !== 'lectures' ? (<TouchableOpacity onPress={() => checkStatistics(item.id, item.type)} style={styles.activity} key={index}>
+                            {item.type === 'practicum' ? (<>
+                              <Text style={styles.activity_text}> {dictionaryL[item.id]}</Text>
+                            </>) : (
+                            item.type === 'tests' ? (<>
+                              <Text style={styles.activity_text}> {dictionaryT[item.id]}</Text>
+                            </>) : null)}
+                        </TouchableOpacity>) : null
                       })}
                       
                     </ScrollView>
