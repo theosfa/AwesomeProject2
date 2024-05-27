@@ -25,7 +25,6 @@ const CreateTeacherScreen = ({ navigation }) => {
                 permission: 'teacher',
             });
 
-            // await signOut(auth);
             signInWithEmailAndPassword(auth, 'admin@admin.com', '12345678')
             .then((userCredential) => {
                 navigation.navigate('Home'); // Assuming 'Home' is a route in your navigator
@@ -34,17 +33,6 @@ const CreateTeacherScreen = ({ navigation }) => {
                 setAnyError(true);
                 setErrorMessage(error.message);
             });
-            // const createUser = functions.httpsCallable('createUser');
-            // await createUser({
-            //     email: email,
-            //     password: password,
-            //     name: name,
-            //     surname: surname,
-            //     role: 'teacher',
-            // });
-
-            // Alert.alert('Success', 'Teacher account created successfully');
-            // navigation.navigate('Главная'); // Navigate to the login screen
         
         } catch (error) {
             setAnyError(true);

@@ -61,11 +61,8 @@ const StudentsMarksListScreen = ({ route, navigation }) => {
                         setStudents([]);
                     }
                 } else {
-                    Alert.alert('Test not found');
                 }
             } catch (error) {
-                console.error('Error fetching test questions:', error);
-                Alert.alert('Failed to fetch test questions.');
             }
             setLoading(false);
         };
@@ -95,7 +92,7 @@ const StudentsMarksListScreen = ({ route, navigation }) => {
                     </View>
                 ))
             ) : (
-                <Text>No students found.</Text>
+                <Text>Студентов не найдено.</Text>
             )}
         </View>
     );

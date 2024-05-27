@@ -23,11 +23,8 @@ const TestScreen = ({ route, navigation }) => {
                     setQuestions(test.questions);
                     setTitle(test.title);
                 } else {
-                    Alert.alert('Test not found');
                 }
             } catch (error) {
-                console.error('Error fetching test questions:', error);
-                Alert.alert('Failed to fetch test questions.');
             }
             setLoading(false);
         };
@@ -84,7 +81,7 @@ const TestScreen = ({ route, navigation }) => {
                     marks: newMarks,
                 });
             } catch (error) {
-                console.error("Error updating user details:", error);
+                console.error("Не удалось добавить оценку", "Если ошибка повториться, обратитесь к администратору");
             }
             navigation.navigate('Главная');
         }

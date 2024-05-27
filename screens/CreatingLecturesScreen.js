@@ -48,11 +48,8 @@ const CreatingLecturesScreen = ({ navigation }) => {
                         setTeacherGroups(teacherGroups);
                     }
                 } else {
-                    Alert.alert('Test not found');
                 }
             } catch (error) {
-                console.error('Error fetching test questions:', error);
-                Alert.alert('Failed to fetch test questions.');
             }
         };
 
@@ -92,10 +89,9 @@ const CreatingLecturesScreen = ({ navigation }) => {
                     });  // Replace 'test-id' and 'score' with actual values
                 }
                 
-                Alert.alert("Lecture added");
+                Alert.alert("Лекция добавлена");
             } catch (error) {
-                console.error("Error adding lecture:", error);
-                Alert.alert("Update Failed", error.message);
+                Alert.alert("Ошибка добавления лекции", "Если ошибка повторяется, обратитесь к администратору");
             }
             setTest([])
             setTitle('')
@@ -140,19 +136,21 @@ const CreatingLecturesScreen = ({ navigation }) => {
         console.log('Hello')
     }
 
-    const addAnswerField = () => {
-        setAnswers([...answers, { text: '' }]);
-    }
-
-    const updateAnswer = (text, index) => {
-        const newAnswers = answers.slice();
-        newAnswers[index].text = text;
-        setAnswers(newAnswers);
-    }
-
-    const chooseGroup = (id) => {
-        setGroup(id);
-        setIsGroup(false);
+    const reset = () => {
+        setQuestionTitle('');
+        setAnswers([{ text: '' }]); // Reset answers
+        setCorrectAnswer('');
+        setPracticumQuestion('');
+        setInputHeight1(45)
+        setInputHeight2(45)
+        setInputHeight3(45)
+        setText('');
+        setTest([])
+        setTitle('')
+        setIsTest(false);
+        setIsPracticum(false);
+        setIsLecture(false);
+        setPrivacy('');
     }
     
 
@@ -203,8 +201,11 @@ const CreatingLecturesScreen = ({ navigation }) => {
                 <Text style={styles.textLogin} >Добавить тему</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={updateTest} style={styles.register} >
-                <Text style={styles.textLogin} >Сформировать лекцию</Text>
+                <Text style={styles.textLogin} >Сформировать практикум</Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={reset} style={styles.registerMain} >
+                    <Text style={styles.textLogin} >Отменить создание</Text>
+                </TouchableOpacity>
             </ScrollView>
         </>) : (<>
             <ScrollView 
@@ -238,13 +239,16 @@ const CreatingLecturesScreen = ({ navigation }) => {
             <TouchableOpacity onPress={updateTest} style={styles.register} >
                 <Text style={styles.textLogin} >Сформировать лекцию</Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={reset} style={styles.registerMain} >
+                    <Text style={styles.textLogin} >Отменить создание</Text>
+                </TouchableOpacity>
             </ScrollView>
         
         </>)}
         </>) : (<>
             {privacy ? (<>
                 <TextInput
-                    placeholder="Название лекции"
+                    placeholder="Название"
                     value={title}
                     onChangeText={setTitle}
                     // secureTextEntry
@@ -253,12 +257,15 @@ const CreatingLecturesScreen = ({ navigation }) => {
                 <TouchableOpacity onPress={createTest} style={styles.registerMain} >
                     <Text style={styles.textLogin} >Добавить название</Text>
                 </TouchableOpacity>
-            </>) : (<>
-                <TouchableOpacity onPress={() => setPrivacyTest('with')} style={styles.registerMain} >
-                    <Text style={styles.textLogin} >Создать практикум</Text>
+                <TouchableOpacity onPress={reset} style={styles.registerMain} >
+                    <Text style={styles.textLogin} >Отменить создание</Text>
                 </TouchableOpacity>
+            </>) : (<>
                 <TouchableOpacity onPress={() => setPrivacyTest('without')} style={styles.registerMain} >
                     <Text style={styles.textLogin} >Создать лекцию</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setPrivacyTest('with')} style={styles.registerMain} >
+                    <Text style={styles.textLogin} >Создать практикум</Text>
                 </TouchableOpacity>
             </>)}
                

@@ -28,43 +28,9 @@ const GroupListScreen = ({ navigation }) => {
                         const teacherGroups = groups.map(group => group.id);
                         setTeacherGroups(teacherGroups);
                     }
-                    // if (studentIds.length > 0) {
-                    //     const studentsCollectionRef = collection(db, 'students');
-                    //     const q = query(studentsCollectionRef, where('__name__', 'in', studentIds));
-                    //     const querySnapshot = await getDocs(q);
-                        
-                    //     const studentsData = querySnapshot.docs.map(doc => ({
-                    //         id: doc.id,
-                    //         ...doc.data(),
-                    //     }));
-
-                    //     const testsCollectionRef = collection(db, 'students');
-                    //     const snapshot = await getDocs(testsCollectionRef);
-                    //     const dict = snapshot.docs.reduce((acc, doc) => {
-                    //         acc[doc.id] = doc.data().id;
-                    //         return acc;
-                    //     }, {});
-                    //     console.log(dict)
-                        
-                    //     const studentsWithScores = marks.map(mark => {
-                    //         const studentData = studentsData.find(student => student.id === dict[mark.id]);
-                    //         // console.log(studentData)
-                    //         return {
-                    //             ...studentData,
-                    //             score: mark.score
-                    //         };
-                    //     });
-                        
-                    //     setStudents(studentsWithScores.reverse());
-                    // } else {
-                    //     setStudents([]);
-                    // }
                 } else {
-                    Alert.alert('Test not found');
                 }
             } catch (error) {
-                console.error('Error fetching test questions:', error);
-                Alert.alert('Failed to fetch test questions.');
             }
             setLoading(false);
         };
@@ -83,26 +49,31 @@ const GroupListScreen = ({ navigation }) => {
         const teacherRef = doc(db, 'users', userId);
         // const userSnapshot = await getDoc(userRef);
         const teacherSnapshot = await getDoc(teacherRef);
-        try {
-            let newGroupT = [];
-            if (teacherSnapshot.exists()) {
-                console.log('hi');
-                const teacherData = teacherSnapshot.data();
-                const GroupT = teacherData.groups || [];
-                newGroupT = [...GroupT, { id: name, students: [] }];// Replace 'test-id' and 'score' with actual values
-                await updateDoc(teacherRef, {
-                    groups: newGroupT,
-                });
-                setName('');
-                setRefresh(prev => !prev);
-            } else {
-                console.log('hi2');
-                Alert.alert("Студент не найден", "Попробуйте ввести другой никнейм");
+        if(name !== ''){
+            try {
+                let newGroupT = [];
+                if (teacherSnapshot.exists()) {
+                    console.log('hi');
+                    const teacherData = teacherSnapshot.data();
+                    const GroupT = teacherData.groups || [];
+                    newGroupT = [...GroupT, { id: name, students: [] }];// Replace 'test-id' and 'score' with actual values
+                    await updateDoc(teacherRef, {
+                        groups: newGroupT,
+                    });
+                    setName('');
+                    setRefresh(prev => !prev);
+                } else {
+                    console.log('hi2');
+                    Alert.alert("Ошибка добавления группы", "Если ошибка повторяется, обратитесь к администратору");
+                }
+            } catch (error) {
+                console.log(error);
+                Alert.alert("Ошибка добавления группы", "Если ошибка повторяется, обратитесь к администратору");
             }
-        } catch (error) {
-            console.log(error);
-            Alert.alert("Студент не найден");
+        } else {
+            Alert.alert("Ошибка добавления группы", "Введите не пустое значение");
         }
+        
     }
     
 
@@ -121,13 +92,13 @@ const GroupListScreen = ({ navigation }) => {
                 {teacherGroups.length > 0 ? (
                     teacherGroups.map((group, index) => (
                         <View style={styles.optionButton} key={index}>
-                            <TouchableOpacity onPress={() => goToGroup(group)} >
+                            <TouchableOpacity onPress={() => goToGroup(group)}  style={styles.optionButton2} >
                                 <Text style={styles.optionStyle} > Группа: {group}</Text>
                             </TouchableOpacity>
                         </View>
                     ))
                 ) : (
-                    <Text>No group found.</Text>
+                    <Text>Не найдено групп.</Text>
                 )}
             </ScrollView>
             <View style={styles.inputStyle}>
@@ -203,6 +174,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    optionButton2: {
+        minWidth: '95%',
+        maxWidth: '95%',
+        // maxHeight: 50,
+        // minHeight: 50,
+        // marginBottom: 10,
+        // borderWidth: 1,
+        // padding: 10,
+        // borderRadius: 20,
+        backgroundColor: '#F0F0F0',
+        flex: 1,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
     optionStyle:{
         color: 'black',
         fontSize: 20,
@@ -249,7 +236,7 @@ const styles = StyleSheet.create({
     },
       textLogin:{
         color:'#fff',
-        fontSize: 20,
+        fontSize: 22,
         fontFamily: 'Poppins-Bold'
     },
     text :{
@@ -259,8 +246,8 @@ const styles = StyleSheet.create({
     register: {
         backgroundColor: "#000",
         // height: 50,
-        maxHeight: 50,
-        minHeight: 50,
+        maxHeight: 80,
+        minHeight: 80,
         minwidth: '100%',
         flex: 1,
         marginTop: '5%',

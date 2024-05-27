@@ -46,27 +46,21 @@ const ProfileScreen = ({ navigation }) => {
                         }
                         
                     } else {
-                        console.log('No such document!');
                     }
                 } catch (error) {
-                    console.error("Error fetching user details:", error);
                 }
             }
             setLoading(false);
         };
 
         if (isFocused) {
-            fetchUserProfile(); // Fetch data when the screen is focused
+            fetchUserProfile();
         }
     }, [isFocused]);
 
     const handleLogout = () => {
         signOut(auth).then(() => {
-            // Sign-out successful.
-            // Alert.alert("Logged Out", "You have successfully logged out.");
         }).catch((error) => {
-            // An error happened.
-            // Alert.alert("Logout Failed", error.message);
         });
     };
 
@@ -98,7 +92,8 @@ const ProfileScreen = ({ navigation }) => {
                     </TouchableOpacity>
 
                     <View>
-                      <Text style={styles.name}>{userProfile.name} {userProfile.surname}</Text>
+                      <Text style={styles.name3}>{userProfile.name} {userProfile.surname}</Text>
+                      <Text style={styles.name}>{userProfile.username}</Text>
                       <TouchableOpacity  onPress={openTeachersList} style={styles.headerRight3}>
                         <Text style={styles.headerRight2}>Преподаватели</Text>
                       </TouchableOpacity>
@@ -350,7 +345,15 @@ const ProfileScreen = ({ navigation }) => {
     name: {
       fontSize: 20,
       fontWeight: 'bold',
-      marginBottom: '5%',
+      marginBottom: '7.5%',
+      color: 'black',
+
+      // backgroundColor: 'green',
+    },
+    name3: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      marginBottom: '2.5%',
       color: 'black',
 
       // backgroundColor: 'green',

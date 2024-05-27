@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, Alert,TouchableOpacity, ScrollView } from 'react-native';
 import { auth, db } from '../firebaseConfig';
+import { useIsFocused } from '@react-navigation/native';
 import { doc, collection, addDoc, getDoc, updateDoc, setDoc, setIndexConfiguration } from 'firebase/firestore';
 import RNPickerSelect from 'react-native-picker-select';
 import { set } from 'firebase/database';
@@ -24,6 +25,7 @@ const LearningAddingScreen = ({ navigation }) => {
     const [correctAnswer, setCorrectAnswer] = useState('');
     const [group, setGroup] = useState('');
     const [isGroup, setIsGroup] = useState(false);
+    const isFocused = useIsFocused();
 
     useEffect(() => {
         const fetchTestQuestions = async () => {
@@ -44,16 +46,15 @@ const LearningAddingScreen = ({ navigation }) => {
                         setTeacherGroups(teacherGroups);
                     }
                 } else {
-                    Alert.alert('Test not found');
                 }
             } catch (error) {
-                console.error('Error fetching test questions:', error);
-                Alert.alert('Failed to fetch test questions.');
             }
         };
 
-        fetchTestQuestions();
-    }, []);
+        if (isFocused) {
+            fetchTestQuestions();
+        }
+    }, [isFocused]);
 
 
     
@@ -93,10 +94,9 @@ const LearningAddingScreen = ({ navigation }) => {
                     });  // Replace 'test-id' and 'score' with actual values
                 }
                 
-                Alert.alert("Lecture added");
+                Alert.alert("Тест добавлен");
             } catch (error) {
-                console.error("Error adding lecture:", error);
-                Alert.alert("Update Failed", error.message);
+                Alert.alert("Ошибка добавления теста", "Если ошибка повторяется, обратитесь к администратору");
             }
             setTest([])
             setTitle('')
@@ -143,6 +143,16 @@ const LearningAddingScreen = ({ navigation }) => {
         setGroup(id);
         setIsGroup(false);
     }
+
+    const reset = () => {
+        setTest([])
+        setTitle('')
+        setIsTest(false);
+        setIsPrivacy(false);
+        setQuestionTitle('');
+        setAnswers([{ text: '' }]); // Reset answers
+        setCorrectAnswer('');
+    }
     
 
     return (
@@ -183,12 +193,15 @@ const LearningAddingScreen = ({ navigation }) => {
                         onChangeText={setCorrectAnswer}
                         style={styles.input}
                     />
-            <TouchableOpacity onPress={addQuestion} style={styles.register} >
+            <TouchableOpacity onPress={addQuestion} style={styles.registerMain} >
                 <Text style={styles.textLogin} >Добавить вопрос</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={updateTest} style={styles.register} >
+            <TouchableOpacity onPress={updateTest} style={styles.registerMain} >
                 <Text style={styles.textLogin} >Сформировать тест</Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={reset} style={styles.registerMain} >
+                        <Text style={styles.textLogin} >Отменить создание</Text>
+                    </TouchableOpacity>
             </ScrollView>
         </>) : (<>
             {isPrivacy ? (<>
@@ -203,7 +216,7 @@ const LearningAddingScreen = ({ navigation }) => {
                         {teacherGroups.length > 0 ? (
                             teacherGroups.map((group, index) => (
                                 <View style={styles.button} key={index}>
-                                    <TouchableOpacity onPress={() => chooseGroup(group)} >
+                                    <TouchableOpacity onPress={() => chooseGroup(group)} style={styles.button2} >
                                         <Text style={styles.button_text} > Группа: {group}</Text>
                                     </TouchableOpacity>
                                 </View>
@@ -222,6 +235,9 @@ const LearningAddingScreen = ({ navigation }) => {
                     />
                     <TouchableOpacity onPress={createTest} style={styles.registerMain} >
                         <Text style={styles.textLogin} >Создать тест</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={reset} style={styles.registerMain} >
+                        <Text style={styles.textLogin} >Отменить создание</Text>
                     </TouchableOpacity>
                 </>)}
             </>) : (<>
@@ -276,14 +292,14 @@ const styles = StyleSheet.create({
         color: 'black',
         fontSize: 20,
     },
-    button: {
-        fontSize: 18,
-        marginBottom: 10,
-        borderWidth: 1,
-        padding: 10,
-        borderRadius: 5,
-        minwidth: '100%',
-    },
+    // button: {
+    //     fontSize: 18,
+    //     marginBottom: 10,
+    //     borderWidth: 1,
+    //     padding: 10,
+    //     borderRadius: 5,
+    //     minwidth: '100%',
+    // },
     textLogin:{
         color:'#fff',
         fontSize: 20,
@@ -377,7 +393,7 @@ const styles = StyleSheet.create({
         minHeight: 80,
         marginBottom: "6%",
         // borderWidth: 1,
-        padding: 10,
+        // padding: 10,
         marginLeft:"2.5%",
         marginRight:"2.5%",
         borderRadius: 20,
@@ -390,6 +406,28 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 5,
+    },
+    button2: {
+        fontSize: 18,
+        // width: '85%',
+        minWidth: '95%',
+        maxWidth: '95%',
+        minHeight: 50,
+        // marginBottom: "6%",
+        // borderWidth: 1,
+        // padding: 10,
+        // marginLeft:"2.5%",
+        // marginRight:"2.5%",
+        borderRadius: 20,
+        backgroundColor: '#F0F0F0',
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        // shadowColor: "#000",
+        // shadowOffset: { width: 0, height: 2 },
+        // shadowOpacity: 0.25,
+        // shadowRadius: 3.84,
+        // elevation: 5,
     },
     profileImage: {
         alignSelf: 'center',

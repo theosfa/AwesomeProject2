@@ -71,11 +71,7 @@ const ProfileScreen = ({ navigation }) => {
 
     const handleLogout = () => {
         signOut(auth).then(() => {
-            // Sign-out successful.
-            // Alert.alert("Logged Out", "You have successfully logged out.");
         }).catch((error) => {
-            // An error happened.
-            // Alert.alert("Logout Failed", error.message);
         });
     };
 
@@ -112,7 +108,7 @@ const ProfileScreen = ({ navigation }) => {
                   </View>
                   <View style={styles.activitys}>
                     <TouchableOpacity onPress={() => addStudents()} style={styles.activity2}>
-                      <Text style={styles.activity_text2}>Добавить людей в группу</Text>
+                      <Text style={styles.activity_text2}>Работа с группами</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -144,13 +140,13 @@ const ProfileScreen = ({ navigation }) => {
                   :
                   <View style={styles.scroll}>
                     <Text style={styles.name}>Просмотр статистики</Text>
-                    <Text>Cтатистикf отсутствует</Text>
+                    <Text>Cтатистика отсутствует</Text>
                   </View>
                 }
               </View>
             ) : (
               <>
-                <Text>No user data found</Text>
+                <Text>Не найдено данных</Text>
                 <TouchableOpacity  onPress={handleLogout}>
                       <Text style={styles.headerRight2}>Exit</Text>
                     </TouchableOpacity>
@@ -184,6 +180,7 @@ const ProfileScreen = ({ navigation }) => {
       flex: 1,
       flexDirection: 'row',
       // backgroundColor:'purple',
+      marginBottom: "2.5%",
       flexGrow:2,
       // backgroundColor:'red'
     },

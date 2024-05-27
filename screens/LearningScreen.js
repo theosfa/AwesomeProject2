@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Image } from 'react-native';
 import { auth, db } from '../firebaseConfig';
 import { doc, collection, addDoc, getDocs } from 'firebase/firestore';
 
 const LearningScreen = ({ navigation }) => {
     const [lectureTitles, setLectureTitles] = useState([]);
     const [lectureIds, setLectureIds] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filteredTestTitles, setFilteredTestTitles] = useState([]);
+    const [showSearchBar, setShowSearchBar] = useState(false); // State for showing search bar
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -17,9 +20,8 @@ const LearningScreen = ({ navigation }) => {
                 const ids = snapshot.docs.map(doc => doc.id);
                 setLectureTitles(titles);
                 setLectureIds(ids);
-            } catch (error) {
-                console.error('Error fetching test titles:', error);
-                Alert.alert('Failed to fetch test titles.');
+                setFilteredTestTitles(titles);
+            } catch (error) { 
             }
             setLoading(false);
         };
@@ -32,8 +34,39 @@ const LearningScreen = ({ navigation }) => {
         navigation.navigate('Лекция', { id });
     };
 
+    const handleSearch = (query) => {
+        setSearchQuery(query);
+        const filteredTitles = lectureTitles.filter(title =>
+            title.toLowerCase().includes(query.toLowerCase())
+        );
+        setFilteredTestTitles(filteredTitles);
+    };
+
+    React.useLayoutEffect(() => {
+        navigation.setOptions({
+            headerRight: () => (
+                <TouchableOpacity onPress={() => setShowSearchBar(prev => !prev)} style={styles.headerButton}>
+                    {/* <Text style={styles.headerButtonText}>{showSearchBar ? 'Скрыть' : 'Поиск'}</Text> */}
+                    {showSearchBar ? (<>
+                        <Image source={require('../assets/images/search.png')} style={styles.headerButtonText}/> 
+                    </>) : (<>
+                        <Image source={require('../assets/images/search.png')} style={styles.headerButtonText}/> 
+                    </>)}
+                </TouchableOpacity>
+            ),
+        });
+    }, [navigation, showSearchBar]);
+
     return (
         <View style={styles.container}>
+            {showSearchBar && (
+                <TextInput 
+                    style={styles.searchBar} 
+                    placeholder="Поиск тестов..." 
+                    value={searchQuery} 
+                    onChangeText={handleSearch}
+                />
+            )}
             <ScrollView 
                 
                 showsVerticalScrollIndicator={false}
@@ -45,7 +78,7 @@ const LearningScreen = ({ navigation }) => {
                 source={require('../assets/images/tests.png')} // Replace with your actual profile image source
                 style={styles.profileImage}
             /> */}
-            {lectureTitles.map((lecture, index) => (
+            {filteredTestTitles.map((lecture, index) => (
                 <TouchableOpacity key={index} onPress={() => handleTestPress(lectureIds[index])}  style={styles.button}>
                     <Text style={styles.button_text}>{lecture}</Text>
                 </TouchableOpacity>
@@ -61,6 +94,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         // padding: 20,
+        paddingTop: "2.5%",
         backgroundColor: '#fff'
     },
     scroll: {
@@ -99,7 +133,32 @@ const styles = StyleSheet.create({
         fontFamily: 'Poppins-Bold',
         fontSize: 20,
         color: 'black',
-    }
+    },
+    headerButton: {
+        marginRight: 10,
+    },
+    headerButtonText: {
+        color: 'white',
+        fontSize: 16,
+        height: 30,
+        width: 30,
+    },
+    searchBar: {
+        width: '90%',
+        height: 40,
+        borderColor: '#ccc',
+        // borderColor: '#000',
+        // borderWidth: 1,
+        borderRadius: 10,
+        paddingLeft: 10,
+        marginBottom: 20,
+        backgroundColor: '#F0F0F0',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
 });
 
 export default LearningScreen;

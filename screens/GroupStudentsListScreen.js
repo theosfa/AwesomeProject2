@@ -58,11 +58,8 @@ const GroupStudentsListScreen = ({ route }) => {
                         setStudents([]);
                     }
                 } else {
-                    Alert.alert('Test not found');
                 }
             } catch (error) {
-                console.error('Error fetching test questions:', error);
-                Alert.alert('Failed to fetch test questions.');
             }
             setLoading(false);
         };
@@ -87,12 +84,11 @@ const GroupStudentsListScreen = ({ route }) => {
                 const teacherData = teacherSnapshot.data();
                 const GroupT = teacherData.groups || [];
                 const userData = userSnapshot.data();
-                const GroupS = userData.group || [];
+                const GroupS = userData.groups || [];
                 
                 // Find the group in the teacher's groups
                 const groupIndex = GroupT.findIndex(g => g.id === group);
                 if (groupIndex === -1) {
-                    Alert.alert("Group not found", "The specified group does not exist.");
                     return;
                 }
                 
@@ -120,11 +116,10 @@ const GroupStudentsListScreen = ({ route }) => {
                 setUserName('');
                 setRefresh(prev => !prev);
             } else {
-                Alert.alert("User not found", "The specified user does not exist.");
+                Alert.alert("Студент не найден", "Попробуйте ввести другой никнейм");
             }
         } catch (error) {
-            console.error("Error updating student data:", error);
-            Alert.alert("Error", "There was an error updating the student data.");
+            Alert.alert("Студент не найден", "Попробуйте ввести другой никнейм");
         }
     };
 
@@ -140,11 +135,11 @@ const GroupStudentsListScreen = ({ route }) => {
                 students.map((student, index) => (
                     <View style={styles.optionButton} key={index}>
                         <Text  style={styles.optionStyle}>Имя: {student.name}, </Text>
-                        <Text  style={styles.optionStyle}>Фамилия: {student.surname}, </Text>
+                        <Text  style={styles.optionStyle}>Фамилия: {student.surname} </Text>
                     </View>
                 ))
             ) : (
-                <Text>No students found.</Text>
+                <Text>Ни один студент не найден.</Text>
             )}
             </ScrollView>
             <View style={styles.inputStyle}>

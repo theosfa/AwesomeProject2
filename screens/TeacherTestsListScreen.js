@@ -41,8 +41,6 @@ const TeacherTestsListScreen = ({ route, navigation }) => {
                     setIsTests(true);
                 }
             } catch (error) {
-                console.error('Error fetching test titles:', error);
-                Alert.alert('Failed to fetch test titles.');
             }
             setLoading(false);
         };

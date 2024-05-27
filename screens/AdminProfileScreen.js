@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, ActivityIndicator, Alert , Image, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator , Image, TouchableOpacity } from 'react-native';
 import {  GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useIsFocused } from '@react-navigation/native';
 import { auth, db } from '../firebaseConfig'; // Ensure this path is correct
@@ -55,11 +55,7 @@ const AdminProfileScreen = ({ navigation }) => {
 
     const handleLogout = () => {
         signOut(auth).then(() => {
-            // Sign-out successful.
-            // Alert.alert("Logged Out", "You have successfully logged out.");
         }).catch((error) => {
-            // An error happened.
-            // Alert.alert("Logout Failed", error.message);
         });
     };
 
