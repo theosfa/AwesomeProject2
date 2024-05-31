@@ -271,8 +271,8 @@ const styles = StyleSheet.create({
     register: {
         backgroundColor: "#000",
         // height: 50,
-        maxHeight: 50,
-        minHeight: 50,
+        maxHeight: 80,
+        minHeight: 80,
         minwidth: '100%',
         flex: 1,
         marginTop: '5%',

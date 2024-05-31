@@ -77,7 +77,7 @@ const HomeScreen = ({ navigation }) => {
             {showSearchBar && (
                 <TextInput 
                     style={styles.searchBar} 
-                    placeholder="Поиск тестов..." 
+                    placeholder="Поиск по названию..." 
                     value={searchQuery} 
                     onChangeText={handleSearch}
                 />

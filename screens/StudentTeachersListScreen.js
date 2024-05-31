@@ -75,8 +75,7 @@ const StudentTeachersListScreen = ({ navigation }) => {
                     </View>
                 ))
             ) : (
-                <Text>Не найдено преподават0.
-                    елей.</Text>
+                <Text>Не найдено преподавателей.</Text>
             )}
             </ScrollView>
         </View>

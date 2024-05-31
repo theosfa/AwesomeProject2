@@ -89,9 +89,9 @@ const CreatingLecturesScreen = ({ navigation }) => {
                     });  // Replace 'test-id' and 'score' with actual values
                 }
                 
-                Alert.alert("Лекция добавлена");
+                Alert.alert("Успешно добавлено");
             } catch (error) {
-                Alert.alert("Ошибка добавления лекции", "Если ошибка повторяется, обратитесь к администратору");
+                Alert.alert("Ошибка добавления", "Если ошибка повторяется, обратитесь к администратору");
             }
             setTest([])
             setTitle('')

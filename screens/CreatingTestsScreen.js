@@ -43,7 +43,7 @@ const LearningAddingScreen = ({ navigation }) => {
                     if (groups){
                         console.log(groups);
                         const teacherGroups = groups.map(group => group.id);
-                        setTeacherGroups(teacherGroups);
+                        setTeacherGroups(teacherGroups.reverse());
                     }
                 } else {
                 }
