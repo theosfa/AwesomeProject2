@@ -31,7 +31,6 @@ const StudentTeachersListScreen = ({ navigation }) => {
                     return acc;
                   }, {});
                 setDictionary(dict);
-                console.log(dict["1KbSwveKrMe0QF7Q2ip9XOftzH23"].name);
                 console.log(studentData.groups);
                 studentData.groups.map( teacher => {
                     console.log(dict[teacher.id].name)

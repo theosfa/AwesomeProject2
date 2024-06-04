@@ -109,16 +109,26 @@ const LearningAddingScreen = ({ navigation }) => {
    
 
     const createTest = () => {
-        setIsTest(true);
+        if (title !== ""){
+            setIsTest(true);
+        } else {
+            Alert.alert("Ошибка", "Заполните поле название");
+        }
+
         console.log('Hello')
     }
 
     const addQuestion = () => {
+        const allTextsNotEmpty = answers.every(a => a.text !== "");
+        if ( questionTitle !== "" && correctAnswer !== "" && allTextsNotEmpty){
         const newQuestion = { question: questionTitle, answer: correctAnswer, options: answers.map(a => a.text) };
         setTest(prevTest => [...prevTest, newQuestion]);
         setQuestionTitle('');
         setAnswers([{ text: '' }]); // Reset answers
         setCorrectAnswer('');
+        } else {
+            Alert.alert("Ошибка", "Заполните все поля");
+        }
     }
 
     const setPrivacyTest = (privacy) => {

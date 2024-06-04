@@ -31,4 +31,3 @@ if (!firebase.apps.length) {
 }
 
 export { auth, db, functions, firebase };
-

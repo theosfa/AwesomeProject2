@@ -108,20 +108,31 @@ const CreatingLecturesScreen = ({ navigation }) => {
     
     const addQuestion = () => {
         let newQuestion;
-        if (privacy === "with"){
-            newQuestion = { title : questionTitle, text : text, practicumQuestion: practicumQuestion, correctAnswer: correctAnswer};
-        }else{
+        if (questionTitle !== "" && text !== "" && privacy === "without"){
             newQuestion = {title : questionTitle, text : text};
+            setTest(prevTest => [...prevTest, newQuestion]);
+            setQuestionTitle('');
+            setAnswers([{ text: '' }]); // Reset answers
+            setCorrectAnswer('');
+            setPracticumQuestion('');
+            setInputHeight1(45)
+            setInputHeight2(45)
+            setInputHeight3(45)
+            setText('');
+        }else if(questionTitle !== "" && text !== "" && practicumQuestion !== "" && correctAnswer !== ""){
+            newQuestion = { title : questionTitle, text : text, practicumQuestion: practicumQuestion, correctAnswer: correctAnswer};
+            setTest(prevTest => [...prevTest, newQuestion]);
+            setQuestionTitle('');
+            setAnswers([{ text: '' }]); // Reset answers
+            setCorrectAnswer('');
+            setPracticumQuestion('');
+            setInputHeight1(45)
+            setInputHeight2(45)
+            setInputHeight3(45)
+            setText('');
+        } else {
+            Alert.alert("Ошибка", "Заполните все поля");
         }
-        setTest(prevTest => [...prevTest, newQuestion]);
-        setQuestionTitle('');
-        setAnswers([{ text: '' }]); // Reset answers
-        setCorrectAnswer('');
-        setPracticumQuestion('');
-        setInputHeight1(45)
-        setInputHeight2(45)
-        setInputHeight3(45)
-        setText('');
     }
     
     const setPrivacyTest = (privacy) => {
@@ -132,8 +143,11 @@ const CreatingLecturesScreen = ({ navigation }) => {
     }
     
     const createTest = () => {
-        setIsLecture(true);
-        console.log('Hello')
+        if (title !== ""){
+            setIsLecture(true);
+        } else {
+            Alert.alert("Ошибка", "Заполните поле название");
+        }
     }
 
     const reset = () => {
